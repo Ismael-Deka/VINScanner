@@ -47,7 +47,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         mCircle = (ProgressBar) findViewById(R.id.circle);
         mCircle.setVisibility(View.INVISIBLE);
-        
+
+
+        mEditText.setText("YV1CZ852551196931", TextView.BufferType.EDITABLE);
 
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 if(validateVin(newVin)){
                     mVin = newVin;
                     getSupportLoaderManager().initLoader(1, null, MainActivity.this).forceLoad();
+
                 }
             }
         });
@@ -90,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mYear.setText(car.getYear());
         mVinText.setText(car.getVin());
 
+        getSupportLoaderManager().destroyLoader(1);
 
     }
 

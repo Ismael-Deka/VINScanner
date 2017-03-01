@@ -16,25 +16,25 @@
         android:textSize="24sp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Make" />
+        android:text="@string/make" />
     <TextView
         android:id="@+id/model"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="24sp"
-        android:text="Model"/>
+        android:text="@string/model"/>
     <TextView
         android:id="@+id/year"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="24sp"
-        android:text="Year"/>
+        android:text="@string/year"/>
     <TextView
         android:id="@+id/vin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="24sp"
-        android:text="VIN"/>
+        android:text="@string/vin"/>
     <EditText
         android:id="@+id/edit_text"
         android:layout_width="match_parent"
@@ -45,7 +45,12 @@
         android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="enter"/>
+        android:text="@string/enter"/>
+    <Button
+        android:id="@+id/scan_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/scan_from_camera"/>
     <ProgressBar
         android:id="@+id/circle"
     android:layout_width="wrap_content"

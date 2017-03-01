@@ -1,6 +1,7 @@
 package com.example.vinscanner;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -12,6 +13,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.vision.barcode.Barcode;
+
 import static com.example.vinscanner.R.id.make;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Car> {
@@ -19,7 +23,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public static final String LOG_TAG = MainActivity.class.getName();
 
 
-    private String mVin;
 
     private TextView mMake;
     private TextView mModel;
@@ -28,8 +31,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private EditText mEditText;
     private Button mButton;
+    private Button mScanButton;
 
     private ProgressBar mCircle;
+
+    private String mVin;
 
 
     @Override
@@ -45,11 +51,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mEditText = (EditText) findViewById(R.id.edit_text);
         mButton = (Button) findViewById(R.id.button);
 
+        mScanButton =(Button) findViewById(R.id.scan_button);
+
         mCircle = (ProgressBar) findViewById(R.id.circle);
         mCircle.setVisibility(View.INVISIBLE);
 
 
-        mEditText.setText("YV1CZ852551196931", TextView.BufferType.EDITABLE);
+
 
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,6 +71,30 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         });
 
+
+        mScanButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                    Intent cameraIntent = new Intent(MainActivity.this,VinScannerActivity.class);
+                    startActivityForResult(cameraIntent, 1888);
+
+            }
+        });
+
+}
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == CommonStatusCodes.SUCCESS) {
+            Barcode vinBacode;
+            if(data != null) {
+                vinBacode = data.getParcelableExtra("barcode");
+                mVin = vinBacode.displayValue;
+                if(mVin.length()!=17){
+                    mVin = vinBacode.displayValue.substring(1);
+                }
+                getSupportLoaderManager().initLoader(1, null, MainActivity.this).forceLoad();
+            }
+        }
 
     }
     private boolean validateVin(String vin){

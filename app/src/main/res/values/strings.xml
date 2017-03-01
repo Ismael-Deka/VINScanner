@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">VIN Scanner</string>
+
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <string name="title_activity_vin_scanner">VinScannerActivity</string>
+    <string name="make">Make</string>
+    <string name="model">Model</string>
+    <string name="year">Year</string>
+    <string name="vin">VIN</string>
+    <string name="enter">enter</string>
+    <string name="scan_from_camera">scan from camera</string>
 </resources>

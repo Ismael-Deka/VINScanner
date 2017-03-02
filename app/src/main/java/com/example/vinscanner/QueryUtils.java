@@ -27,6 +27,7 @@ public class QueryUtils {
 
 
     public static Car extractCar(String vin) {
+        int errorCode = -1;
         String make = "";
         String model = "";
         String year = "";
@@ -42,6 +43,8 @@ public class QueryUtils {
                 reader = arr.getJSONObject(i);
 
                 switch(reader.getString("Variable")){
+                    case "Error Code":
+                        errorCode = Integer.parseInt(reader.getString("ValueId"));
                     case "Make":
                         make = reader.getString("Value");
                         break;
@@ -73,7 +76,7 @@ public class QueryUtils {
         }
 
 
-        return new Car(make,model,year,vin);
+        return new Car(errorCode,make,model,year,vin);
     }
 
     private static URL createUrl(String vin) {

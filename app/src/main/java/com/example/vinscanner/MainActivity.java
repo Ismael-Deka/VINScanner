@@ -63,11 +63,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             @Override
             public void onClick(View view) {
                 String newVin = mEditText.getText().toString();
-                if(validateVin(newVin)){
-                    mVin = newVin;
-                    getSupportLoaderManager().initLoader(1, null, MainActivity.this).forceLoad();
+                mVin = newVin;
+                getSupportLoaderManager().initLoader(1, null, MainActivity.this).forceLoad();
 
-                }
+
             }
         });
 
@@ -97,10 +96,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
 
     }
-    private boolean validateVin(String vin){
+    private boolean validateVin(int errorCode){
 
-        if(vin.length() < 17){
-            Toast toast = Toast.makeText(this, "Please enter a valid VIN.", Toast.LENGTH_LONG);
+        if(errorCode != 0){
+            Toast toast = Toast.makeText(this, "Invalid VIN.", Toast.LENGTH_LONG);
             toast.show();
             return false;
         }else{
@@ -118,12 +117,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<Car> loader, Car car) {
 
+
         mCircle.setVisibility(View.INVISIBLE);
 
-        mMake.setText(car.getMake());
-        mModel.setText(car.getModel());
-        mYear.setText(car.getYear());
-        mVinText.setText(car.getVin());
+        if(validateVin(car.getErrorCode())) {
+            mMake.setText(car.getMake());
+            mModel.setText(car.getModel());
+            mYear.setText(car.getYear());
+            mVinText.setText(car.getVin());
+        }
 
         getSupportLoaderManager().destroyLoader(1);
 

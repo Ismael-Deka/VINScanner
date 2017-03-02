@@ -7,5 +7,7 @@
     <color name="flashlight_on">#FFEB3B</color>
     <color name="flashlight_off">#212121</color>
 
+    <color name="scanner_line">#D50000</color>
+
     <color name="black_overlay">#66000000</color>
 </resources>

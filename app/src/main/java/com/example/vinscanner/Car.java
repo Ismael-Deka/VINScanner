@@ -6,19 +6,25 @@ package com.example.vinscanner;
 
 public class Car {
 
+    private int mErrorCode;
     private final String mVin;
     private String mMake;
     private String mModel;
     private String mYear;
 
-    public Car(String newMake,String newModel, String newYear, String newVin){
+    public Car(int newErrorCode, String newMake,String newModel, String newYear, String newVin){
 
+        mErrorCode = newErrorCode;
         mMake = newMake;
         mModel = newModel;
         mYear = newYear;
         mVin = newVin;
 
 
+    }
+
+    public int getErrorCode() {
+        return mErrorCode;
     }
 
     public String getMake(){

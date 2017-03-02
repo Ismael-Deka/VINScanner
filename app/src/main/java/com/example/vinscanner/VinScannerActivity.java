@@ -8,6 +8,7 @@ import android.graphics.YuvImage;
 import android.graphics.drawable.GradientDrawable;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.SparseArray;
@@ -136,7 +137,6 @@ public class VinScannerActivity extends AppCompatActivity {
         @Override
         public void surfaceCreated(SurfaceHolder surfaceHolder) {
 
-
             startCamera();
         }
 
@@ -206,8 +206,6 @@ public class VinScannerActivity extends AppCompatActivity {
 
 
 
-
-
     private void detectBarcode(Frame frame){
         BarcodeDetector detector = new BarcodeDetector.Builder(this).setBarcodeFormats(Barcode.CODE_39).build();
         SparseArray<Barcode> barcodes = detector.detect(frame);
@@ -215,6 +213,9 @@ public class VinScannerActivity extends AppCompatActivity {
             Intent i = new Intent();
             Barcode barcode = barcodes.valueAt(0);
             i.putExtra("barcode", barcode);
+
+            vibrate();
+
             Log.e(TAG,"Barcode Found.");
             setResult(CommonStatusCodes.SUCCESS, i);
             finish();
@@ -282,6 +283,13 @@ public class VinScannerActivity extends AppCompatActivity {
                 touchRect.bottom * 2000 / preview.getHeight() - 1000);
 
 
+    }
+
+    private void vibrate(){
+        Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
+        if(vibrator.hasVibrator()) {
+            vibrator.vibrate(500);
+        }
     }
 
 

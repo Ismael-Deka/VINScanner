@@ -37,6 +37,7 @@
         android:text="@string/vin"/>
     <EditText
         android:id="@+id/edit_text"
+        android:hint="Enter VIN"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         />

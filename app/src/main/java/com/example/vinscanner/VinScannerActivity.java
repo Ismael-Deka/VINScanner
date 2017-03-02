@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
+import android.graphics.drawable.GradientDrawable;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -34,7 +35,7 @@ public class VinScannerActivity extends AppCompatActivity {
     private SurfaceView preview;
     private Camera mCamera;
     private  SurfaceHolder holder;
-    private boolean isPreviewRunning;
+    private boolean isFlashLightOn = false;
 
 
     @Override
@@ -49,11 +50,33 @@ public class VinScannerActivity extends AppCompatActivity {
         holder.addCallback(callBack);
 
         ImageView backButton = (ImageView) findViewById(R.id.back_button);
+        final ImageView flashLightCircle = (ImageView)findViewById(R.id.flashlight_circle);
+        final ImageView flashLightIcon = (ImageView) findViewById(R.id.flashlight_icon);
+        final GradientDrawable flashCircleImage = (GradientDrawable) getResources().getDrawable(R.drawable.flashlight_circle);
+
+        if(!isFlashLightOn){
+            turnOffLight(flashLightCircle,flashLightIcon,flashCircleImage);
+        }else{
+            turnOnLight(flashLightCircle,flashLightIcon,flashCircleImage);
+        }
 
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(VinScannerActivity.this.getParentActivityIntent());
+            }
+        });
+
+        flashLightCircle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                if(isFlashLightOn){
+                    turnOffLight(flashLightCircle,flashLightIcon,flashCircleImage);
+                }else{
+                    turnOnLight(flashLightCircle,flashLightIcon,flashCircleImage);
+                }
+
             }
         });
 
@@ -75,6 +98,38 @@ public class VinScannerActivity extends AppCompatActivity {
         Toast.makeText(this, "Tap to Focus Camera.", Toast.LENGTH_LONG).show();
     }
 
+    private void turnOnLight(ImageView circle, ImageView lightBulb,GradientDrawable flashCircle){
+
+        if(mCamera != null){
+            Camera.Parameters params = mCamera.getParameters();
+            params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+            mCamera.setParameters(params);
+        }
+
+        flashCircle.setColor(getResources().getColor(R.color.flashlight_on));
+
+        circle.setBackground(flashCircle);
+        lightBulb.setImageResource(R.drawable.ic_lightbulb_outline_black_24dp);
+        isFlashLightOn = true;
+
+    }
+
+    private void turnOffLight(ImageView circle, ImageView lightBulb,GradientDrawable flashCircle){
+
+        if(mCamera != null){
+            Camera.Parameters params = mCamera.getParameters();
+            params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+            mCamera.setParameters(params);
+        }
+
+        flashCircle.setColor(getResources().getColor(R.color.flashlight_off));
+
+
+        circle.setBackground(flashCircle);
+        lightBulb.setImageResource(R.drawable.ic_lightbulb_outline_white_24dp);
+        isFlashLightOn = false;
+
+    }
 
 
     private SurfaceHolder.Callback callBack = new SurfaceHolder.Callback() {
@@ -179,8 +234,6 @@ public class VinScannerActivity extends AppCompatActivity {
         }
         mCamera.setPreviewCallback(previewCallback);
         mCamera.startPreview();
-
-        isPreviewRunning = true;
     }
 
     public void doTouchFocus(final Rect tfocusRect) {

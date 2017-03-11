@@ -11,30 +11,7 @@
     android:orientation="vertical"
     tools:context="com.example.vinscanner.MainActivity">
 
-    <TextView
-        android:id="@+id/make"
-        android:textSize="24sp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/make" />
-    <TextView
-        android:id="@+id/model"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="24sp"
-        android:text="@string/model"/>
-    <TextView
-        android:id="@+id/year"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="24sp"
-        android:text="@string/year"/>
-    <TextView
-        android:id="@+id/vin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="24sp"
-        android:text="@string/vin"/>
+
     <EditText
         android:id="@+id/edit_text"
         android:hint="Enter VIN"
@@ -52,10 +29,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/scan_from_camera"/>
-    <ProgressBar
-        android:id="@+id/circle"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content" />
 
 
 </LinearLayout>

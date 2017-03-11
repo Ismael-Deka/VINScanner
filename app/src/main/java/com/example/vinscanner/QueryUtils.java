@@ -1,10 +1,16 @@
 package com.example.vinscanner;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -24,6 +30,7 @@ import static com.example.vinscanner.MainActivity.LOG_TAG;
 public class QueryUtils {
 
     private static final String NHTSA_REQUEST_URL_BASE = "https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/";
+    private static final String CARS_DOT_COM_URL_BASE = "https://www.cars.com/research/";
 
 
     public static Car extractCar(String vin) {
@@ -31,13 +38,19 @@ public class QueryUtils {
         String make = "";
         String model = "";
         String year = "";
+        String trim = "";
 
 
+    Log.e(LOG_TAG,vin);
         try {
 
+            //Forming complete Url from Base Url, VIN number, and format parameter
+            String requestUrl =NHTSA_REQUEST_URL_BASE + vin + "?format=json";
+
+            String jsonResponse = makeHttpRequest(createUrl(requestUrl));
 
 
-            JSONObject reader = new JSONObject(makeHttpRequest(createUrl(vin)));
+            JSONObject reader = new JSONObject(jsonResponse);
             JSONArray arr = reader.getJSONArray("Results");
             for(int i = 0; i < arr.length();i++){
                 reader = arr.getJSONObject(i);
@@ -54,14 +67,15 @@ public class QueryUtils {
                     case "Model Year":
                         year = reader.getString("Value");
                         break;
+                    case "Trim":
+                        trim = reader.getString("Value");
                     default:
                         break;
 
                 }
 
-
-
             }
+
 
 
 
@@ -74,16 +88,13 @@ public class QueryUtils {
         } catch (IOException e){
             Log.e("QueryUtils", "Problem reading from Input Stream", e);
         }
+        Bitmap carImage = getCarImage(make,model,year,trim);
 
-
-        return new Car(errorCode,make,model,year,vin);
+        return new Car(errorCode,make,model,year,vin,trim,carImage);
     }
 
-    private static URL createUrl(String vin) {
+    private static URL createUrl(String requestUrl) {
         URL url = null;
-        //Forming complete Url from Base Url, VIN number, and format parameter
-        String requestUrl = NHTSA_REQUEST_URL_BASE + vin + "?format=json";
-
 
         try {
             url = new URL(requestUrl);
@@ -95,13 +106,14 @@ public class QueryUtils {
     }
 
     private static String makeHttpRequest(URL url) throws IOException {
-        String jsonResponse = "";
+
 
         // If the URL is null, then return early.
         if (url == null) {
-            return jsonResponse;
+            return null;
         }
 
+        String response = "";
         HttpURLConnection urlConnection = null;
         InputStream inputStream = null;
         try {
@@ -115,21 +127,19 @@ public class QueryUtils {
             // then read the input stream and parse the response.
             if (urlConnection.getResponseCode() == 200) {
                 inputStream = urlConnection.getInputStream();
-                jsonResponse = readFromStream(inputStream);
+                response = readFromStream(inputStream);
             } else {
                 Log.e(LOG_TAG, "Error response code: " + urlConnection.getResponseCode());
             }
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Problem retrieving the earthquake JSON results.", e);
+            Log.e(LOG_TAG, "Problem retrieving the response.", e);
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
-            }
-            if (inputStream != null) {
                 inputStream.close();
             }
         }
-        return jsonResponse;
+        return response;
     }
     private static String readFromStream(InputStream inputStream) throws IOException {
         //Getting String JSON response from InputStream
@@ -142,8 +152,71 @@ public class QueryUtils {
                 output.append(line);
                 line = reader.readLine();
             }
+
         }
         return output.toString();
     }
 
+    private static Bitmap getCarImage(String make, String model, String year, String trim){
+
+        Document doc = null;
+        try {
+            model=model.replace(" ","_");
+            model=model.replace("-","_");
+
+            doc = Jsoup.connect(CARS_DOT_COM_URL_BASE+make+"-"+model+"-"+year).get();
+            if(isQueryFailed(doc.getElementsByTag("title").first())){
+                //Some Models in the NHTSA Database have space in between certain phases(i.e. MITSUBISHI 3000 GT instead of 3000GT)
+                //This is to correct for those differences
+                doc = Jsoup.connect(CARS_DOT_COM_URL_BASE+make+"-"+model.replace("_","")+"-"+year).get();
+            }
+            if(isQueryFailed(doc.getElementsByTag("title").first())){
+                //Some Model on Cars.com required the trim as well as the model.
+                //This statement includes the trim in the request.
+                doc = Jsoup.connect(CARS_DOT_COM_URL_BASE+make.toLowerCase()+"-"+model.toLowerCase()+"_"+trim+"-"+year).get();
+
+
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Elements element;
+        String imageUrl;
+
+        element= doc.getElementsByAttributeValueContaining("ng-controller","pageStateController as psCtrl");
+        String galleryUrls = element.first().getElementsByAttributeValue("name", "mmy-gallery-lightbox").attr("images");
+
+        if(galleryUrls.isEmpty()){
+            element= doc.getElementsByAttributeValueContaining("class", "slide nonDraggableImage");
+            imageUrl = element.first().attr("src");
+        }else {
+
+            imageUrl = galleryUrls.split("\"[&quot|&quot;,&quot;|&quot;]\"")[0];
+            imageUrl = imageUrl.substring(2);
+        }
+
+        Bitmap carImage = null;
+
+        try {
+            InputStream inputStream = createUrl(imageUrl).openStream();
+            carImage =BitmapFactory.decodeStream(inputStream);
+            inputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return carImage;
+    }
+
+
+    private static boolean isQueryFailed(Element element){
+        //All failed querys have a title of only Cars.com rather than the name of the vehicle
+        if(element.text().equals("Cars.com")){
+            return true;
+        }else{
+            return false;
+        }
+
+    }
 }

@@ -88,7 +88,7 @@ public class QueryUtils {
         } catch (IOException e){
             Log.e("QueryUtils", "Problem reading from Input Stream", e);
         }
-        Bitmap carImage = getCarImage(make,model,year,trim);
+        Bitmap carImage = getCarImage(make,model,year,trim,errorCode);
 
         return new Car(errorCode,make,model,year,vin,trim,carImage);
     }
@@ -157,25 +157,35 @@ public class QueryUtils {
         return output.toString();
     }
 
-    private static Bitmap getCarImage(String make, String model, String year, String trim){
+    private static Bitmap getCarImage(String make, String model, String year, String trim,int errorCode){
+        if(errorCode != 0){
+            return null;
+        }
 
         Document doc = null;
         try {
             model=model.replace(" ","_");
             model=model.replace("-","_");
+            model=model.replace("&","and");
 
             doc = Jsoup.connect(CARS_DOT_COM_URL_BASE+make+"-"+model+"-"+year).get();
+            Log.e(LOG_TAG,CARS_DOT_COM_URL_BASE+make+"-"+model+"-"+year);
             if(isQueryFailed(doc.getElementsByTag("title").first())){
                 //Some Models in the NHTSA Database have space in between certain phases(i.e. MITSUBISHI 3000 GT instead of 3000GT)
                 //This is to correct for those differences
                 doc = Jsoup.connect(CARS_DOT_COM_URL_BASE+make+"-"+model.replace("_","")+"-"+year).get();
+                Log.e(LOG_TAG,CARS_DOT_COM_URL_BASE+make+"-"+model.replace("_","")+"-"+year);
             }
             if(isQueryFailed(doc.getElementsByTag("title").first())){
                 //Some Model on Cars.com required the trim as well as the model.
                 //This statement includes the trim in the request.
                 doc = Jsoup.connect(CARS_DOT_COM_URL_BASE+make.toLowerCase()+"-"+model.toLowerCase()+"_"+trim+"-"+year).get();
+                Log.e(LOG_TAG,CARS_DOT_COM_URL_BASE+make.toLowerCase()+"-"+model.toLowerCase()+"_"+trim+"-"+year);
 
-
+            }
+            if(isQueryFailed(doc.getElementsByTag("title").first())){
+                //if all other query methods fail.
+                return null;
             }
 
         } catch (IOException e) {

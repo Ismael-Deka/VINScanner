@@ -5,7 +5,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
-import android.graphics.drawable.GradientDrawable;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Vibrator;
@@ -17,7 +16,9 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.widget.ImageView;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
@@ -29,13 +30,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 @SuppressWarnings("deprecation")
 public class VinScannerActivity extends AppCompatActivity {
 
     public final String TAG = "VinScannerActivity";
-    private SurfaceView preview;
+    private SurfaceView mPreview;
     private Camera mCamera;
-    private  SurfaceHolder holder;
+    private SurfaceHolder mHolder;
+    private ImageButton mFlashlight;
+    private int mRotation = -1;
     private boolean isFlashLightOn = false;
 
 
@@ -46,20 +50,13 @@ public class VinScannerActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         setContentView(R.layout.activity_vin_scanner);
 
-        preview = (SurfaceView) findViewById(R.id.camera_preview);
-        holder = preview.getHolder();
-        holder.addCallback(callBack);
+        mPreview = (SurfaceView) findViewById(R.id.camera_preview);
+        mHolder = mPreview.getHolder();
+        mHolder.addCallback(callBack);
 
-        ImageView backButton = (ImageView) findViewById(R.id.back_button);
-        final ImageView flashLightCircle = (ImageView)findViewById(R.id.flashlight_circle);
-        final ImageView flashLightIcon = (ImageView) findViewById(R.id.flashlight_icon);
-        final GradientDrawable flashCircleImage = (GradientDrawable) getResources().getDrawable(R.drawable.flashlight_circle);
+        ImageButton backButton = (ImageButton) findViewById(R.id.back_button);
+        mFlashlight = (ImageButton) findViewById(R.id.flashlight);
 
-        if(!isFlashLightOn){
-            turnOffLight(flashLightCircle,flashLightIcon,flashCircleImage);
-        }else{
-            turnOnLight(flashLightCircle,flashLightIcon,flashCircleImage);
-        }
 
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,21 +65,20 @@ public class VinScannerActivity extends AppCompatActivity {
             }
         });
 
-        flashLightCircle.setOnClickListener(new View.OnClickListener() {
+        mFlashlight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 if(isFlashLightOn){
-                    turnOffLight(flashLightCircle,flashLightIcon,flashCircleImage);
+                    turnOffLight(mFlashlight);
                 }else{
-                    turnOnLight(flashLightCircle,flashLightIcon,flashCircleImage);
+                    turnOnLight(mFlashlight);
                 }
 
             }
         });
 
-
-        preview.setOnTouchListener(new View.OnTouchListener() {
+        mPreview.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent event) {
 
@@ -99,7 +95,21 @@ public class VinScannerActivity extends AppCompatActivity {
         Toast.makeText(this, "Tap to Focus Camera.", Toast.LENGTH_LONG).show();
     }
 
-    private void turnOnLight(ImageView circle, ImageView lightBulb,GradientDrawable flashCircle){
+    private void rotateFlashButton(float endRotation){
+        // Create an animation instance
+        Animation an = new RotateAnimation(0.0f, endRotation);
+
+        // Set the animation's parameters
+        an.setDuration(1000);               // duration in ms
+        an.setRepeatCount(0);                // -1 = infinite repeated
+        an.setRepeatMode(Animation.REVERSE); // reverses each repeat
+        an.setFillAfter(true);               // keep rotation after animation
+
+        mFlashlight.setAnimation(an);
+        mFlashlight.animate();
+    }
+
+    private void turnOnLight(ImageButton flashlight){
 
         if(mCamera != null){
             Camera.Parameters params = mCamera.getParameters();
@@ -107,15 +117,12 @@ public class VinScannerActivity extends AppCompatActivity {
             mCamera.setParameters(params);
         }
 
-        flashCircle.setColor(getResources().getColor(R.color.flashlight_on));
-
-        circle.setBackground(flashCircle);
-        lightBulb.setImageResource(R.drawable.ic_lightbulb_outline_black_24dp);
+        flashlight.setImageResource(R.drawable.flashlight_button_on);
         isFlashLightOn = true;
 
     }
 
-    private void turnOffLight(ImageView circle, ImageView lightBulb,GradientDrawable flashCircle){
+    private void turnOffLight(ImageButton flashlight){
 
         if(mCamera != null){
             Camera.Parameters params = mCamera.getParameters();
@@ -123,11 +130,7 @@ public class VinScannerActivity extends AppCompatActivity {
             mCamera.setParameters(params);
         }
 
-        flashCircle.setColor(getResources().getColor(R.color.flashlight_off));
-
-
-        circle.setBackground(flashCircle);
-        lightBulb.setImageResource(R.drawable.ic_lightbulb_outline_white_24dp);
+        flashlight.setImageResource(R.drawable.flashlight_button_off);
         isFlashLightOn = false;
 
     }
@@ -143,68 +146,80 @@ public class VinScannerActivity extends AppCompatActivity {
         @Override
         public void surfaceChanged(SurfaceHolder surfaceHolder, int format, int width, int height) {
 
-            Camera.CameraInfo info = new Camera.CameraInfo();
-            Camera.getCameraInfo(Camera.CameraInfo.CAMERA_FACING_BACK, info);
-            int rotation = VinScannerActivity.this.getWindowManager().getDefaultDisplay().getRotation();
-            int degrees = 0;
-            switch (rotation) {
-                case Surface.ROTATION_0:
-                    degrees = 0;
-                    break;
-                case Surface.ROTATION_90:
-                    degrees = 90;
-                    break;
-                case Surface.ROTATION_180:
-                    degrees = 180;
-                    break;
-                case Surface.ROTATION_270:
-                    degrees = 270;
-                    break;
-            }
-
-            int result;
-
-
-            result = (info.orientation - degrees + 360) % 360;
-
-            mCamera.setDisplayOrientation(result);
+            doHandleRotation();
         }
 
         @Override
         public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
             Log.e(TAG,"Releasing camera");
             mCamera.setPreviewCallback(null);
+            mCamera.stopPreview();
             mCamera.release();
 
         }
     };
 
+    private void doHandleRotation(){
+        Camera.CameraInfo info = new Camera.CameraInfo();
+        Camera.getCameraInfo(Camera.CameraInfo.CAMERA_FACING_BACK, info);
+        int rotation = this.getWindowManager().getDefaultDisplay().getRotation();
+        int degrees = 0;
+        switch (rotation) {
+            case Surface.ROTATION_0:
+                degrees = 0;
+                break;
+            case Surface.ROTATION_90:
+                degrees = 90;
+                break;
+            case Surface.ROTATION_180:
+                degrees = 180;
+                break;
+            case Surface.ROTATION_270:
+                degrees = 270;
+                break;
+        }
+        int result;
+        result = (info.orientation-degrees+360)%360;
+        mCamera.setDisplayOrientation(result);
+        mRotation = result;
+
+    }
+
     Camera.PreviewCallback previewCallback = new Camera.PreviewCallback() {
         @Override
         public void onPreviewFrame(byte[] bytes, Camera camera) {
-            Camera.Size previewSize = camera.getParameters().getPreviewSize();
-            YuvImage yuvimage=new YuvImage(bytes, ImageFormat.NV21, previewSize.width, previewSize.height, null);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            yuvimage.compressToJpeg(new Rect(0, 0, previewSize.width, previewSize.height), 80, baos);
-            byte[] jdata = baos.toByteArray();
-
-
-            Frame frame = new Frame.Builder().setBitmap(BitmapFactory.decodeByteArray(jdata,0,jdata.length)).build();
+            doHandleRotation();
+            byte[] data = formatFrame(bytes);
+            Frame frame = new Frame.Builder().setBitmap(BitmapFactory.decodeByteArray(data,0,data.length)).build();
             detectBarcode(frame);
         }
     };
 
+    private byte[] formatFrame(byte[] bytes){
+        Camera.Size previewSize = mCamera.getParameters().getPreviewSize();
+        YuvImage yuvimage=new YuvImage(bytes, ImageFormat.NV21, previewSize.width, previewSize.height, null);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        yuvimage.compressToJpeg(new Rect(0, 0, previewSize.width, previewSize.height), 80, baos);
+
+        return baos.toByteArray();
+    }
+
     @Override
     protected void onPause() {
-        if(mCamera != null) {
-            Log.e(TAG, "onPause");
-            mCamera.stopPreview();
-        }
-
+        mCamera.setPreviewCallback(null);
+        mCamera.stopPreview();
+        turnOffLight(mFlashlight);
         super.onPause();
     }
 
-
+    @Override
+    protected void onResume() {
+        if(mCamera != null) {
+            mCamera.setPreviewCallback(previewCallback);
+            mCamera.startPreview();
+        }
+        super.onResume();
+    }
 
     private void detectBarcode(Frame frame){
         BarcodeDetector detector = new BarcodeDetector.Builder(this).setBarcodeFormats(Barcode.CODE_39).build();
@@ -226,10 +241,8 @@ public class VinScannerActivity extends AppCompatActivity {
         Log.e(TAG,"Starting Camera.");
         mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_BACK);
 
-
-
         try {
-            mCamera.setPreviewDisplay(holder);
+            mCamera.setPreviewDisplay(mHolder);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -277,10 +290,10 @@ public class VinScannerActivity extends AppCompatActivity {
 
 
         return new Rect(
-                touchRect.left * 2000 / preview.getWidth() - 1000,
-                touchRect.top * 2000 / preview.getHeight() - 1000,
-                touchRect.right * 2000 / preview.getWidth() - 1000,
-                touchRect.bottom * 2000 / preview.getHeight() - 1000);
+                touchRect.left * 2000 / mPreview.getWidth() - 1000,
+                touchRect.top * 2000 / mPreview.getHeight() - 1000,
+                touchRect.right * 2000 / mPreview.getWidth() - 1000,
+                touchRect.bottom * 2000 / mPreview.getHeight() - 1000);
 
 
     }

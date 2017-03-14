@@ -28,7 +28,8 @@
         <activity
             android:name=".VinScannerActivity"
             android:label="@string/title_activity_vin_scanner"
-            android:parentActivityName=".MainActivity"></activity>
+            android:parentActivityName=".MainActivity"
+            android:configChanges="orientation|screenSize|keyboardHidden"></activity>
         <activity android:name=".CarActivity"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait"

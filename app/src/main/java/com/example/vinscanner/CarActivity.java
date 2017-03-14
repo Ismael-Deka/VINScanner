@@ -6,6 +6,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
@@ -22,6 +23,7 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
     private TextView mDescription;
     private AppBarLayout mAppBarLayout;
     private ProgressBar mProgressBar;
+    private CardView mCardView;
     private Toolbar mToolbar;
 
     @Override
@@ -39,15 +41,15 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
         mToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         mAppBarLayout = (AppBarLayout) findViewById(R.id.app_bar_layout);
+        mCardView = (CardView) findViewById(R.id.card);
 
 
         mProgressBar.setVisibility(View.VISIBLE);
-        mToolbarLayout.setVisibility(View.INVISIBLE);
-        mAppBarLayout.setVisibility(View.INVISIBLE);
+        mCardView.setVisibility(View.INVISIBLE);
 
         mVin = getIntent().getStringExtra("Vin");
 
-        mImage.setImageResource(R.drawable.placeholder);
+        mAppBarLayout.setExpanded(false,false);
         getSupportLoaderManager().initLoader(1, null,this).forceLoad();
     }
 
@@ -76,12 +78,15 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
         if(validateVin(car.getErrorCode())) {
 
             mProgressBar.setVisibility(View.INVISIBLE);
-            mAppBarLayout.setVisibility(View.VISIBLE);
-            mToolbarLayout.setVisibility(View.VISIBLE);
+            mCardView.setVisibility(View.VISIBLE);
+
+
 
             mToolbarLayout.setTitle(car.getYear()+" "+car.getMake()+" "+car.getModel());
-           // mToolbarLayout.setC
-            mImage.setImageBitmap(car.getCarImage());
+            if(car.getCarImage() != null) {
+                mImage.setImageBitmap(car.getCarImage());
+                mAppBarLayout.setExpanded(true,true);
+            }
             mDescription.setText("Vin: "+car.getVin());
 
         }

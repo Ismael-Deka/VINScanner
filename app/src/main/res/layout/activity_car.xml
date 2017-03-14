@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context="com.example.vinscanner.CarActivity">
     <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/root_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
@@ -36,14 +37,23 @@
                     android:layout_height="match_parent"
                     android:fitsSystemWindows="true"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/placeholder"
                     app:layout_collapseMode="parallax" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="88dp"
+                    android:background="@drawable/gradient_overlay"
+                    app:layout_collapseMode="pin"/>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="88dp"
+                    android:layout_gravity="bottom"
+                    android:layout_alignBottom="@+id/image"
+                    android:background="@drawable/gradient_action_bar"/>
 
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
-                    android:title=""
                     app:layout_collapseMode="pin" />
 
 

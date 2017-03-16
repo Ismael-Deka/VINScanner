@@ -20,6 +20,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 
 import static com.example.vinscanner.MainActivity.LOG_TAG;
 
@@ -29,8 +30,9 @@ import static com.example.vinscanner.MainActivity.LOG_TAG;
 
 public class QueryUtils {
 
-    private static final String NHTSA_REQUEST_URL_BASE = "https://vpic.nhtsa.dot.gov/api/vehicles/decodevin/";
+    private static final String NHTSA_REQUEST_URL_BASE = "https://vpic.nhtsa.dot.gov/api/vehicles/decodevinextended/";
     private static final String CARS_DOT_COM_URL_BASE = "https://www.cars.com/research/";
+    private static boolean isTrimIncluded = false;
 
 
     public static Car extractCar(String vin) {
@@ -39,6 +41,7 @@ public class QueryUtils {
         String model = "";
         String year = "";
         String trim = "";
+        ArrayList<CarAttribute> attributes = new ArrayList<>();
 
 
     Log.e(LOG_TAG,vin);
@@ -54,28 +57,29 @@ public class QueryUtils {
             JSONArray arr = reader.getJSONArray("Results");
             for(int i = 0; i < arr.length();i++){
                 reader = arr.getJSONObject(i);
-
-                switch(reader.getString("Variable")){
+                String variable = reader.getString("Variable");
+                String value = reader.getString("Value");
+                switch(variable){
                     case "Error Code":
                         errorCode = Integer.parseInt(reader.getString("ValueId"));
                     case "Make":
-                        make = reader.getString("Value");
+                        make = value;
                         break;
                     case "Model":
-                        model = reader.getString("Value");
+                        model = value;
                         break;
                     case "Model Year":
-                        year = reader.getString("Value");
+                        year = value;
                         break;
                     case "Trim":
-                        trim = reader.getString("Value");
+                        trim = value;
                     default:
-                        break;
+                    if(!value.equals("null") )
+                        attributes.add(new CarAttribute(variable,value));
 
                 }
 
             }
-
 
 
 
@@ -88,9 +92,14 @@ public class QueryUtils {
         } catch (IOException e){
             Log.e("QueryUtils", "Problem reading from Input Stream", e);
         }
-        Bitmap carImage = getCarImage(make,model,year,trim,errorCode);
 
-        return new Car(errorCode,make,model,year,vin,trim,carImage);
+        Bitmap[] carImages = getCarImage(make,model,year,trim,errorCode);
+
+        if(isTrimIncluded&&!trim.equals("null")){
+            return new Car(errorCode, make, model + " " + trim, year, vin, carImages, attributes);
+        }else {
+            return new Car(errorCode, make, model, year, vin, carImages, attributes);
+        }
     }
 
     private static URL createUrl(String requestUrl) {
@@ -157,7 +166,7 @@ public class QueryUtils {
         return output.toString();
     }
 
-    private static Bitmap getCarImage(String make, String model, String year, String trim,int errorCode){
+    private static Bitmap[] getCarImage(String make, String model, String year, String trim,int errorCode){
         if(errorCode != 0){
             return null;
         }
@@ -181,7 +190,7 @@ public class QueryUtils {
                 //This statement includes the trim in the request.
                 doc = Jsoup.connect(CARS_DOT_COM_URL_BASE+make.toLowerCase()+"-"+model.toLowerCase()+"_"+trim+"-"+year).get();
                 Log.e(LOG_TAG,CARS_DOT_COM_URL_BASE+make.toLowerCase()+"-"+model.toLowerCase()+"_"+trim+"-"+year);
-
+                isTrimIncluded = true;
             }
             if(isQueryFailed(doc.getElementsByTag("title").first())){
                 //if all other query methods fail.
@@ -192,41 +201,43 @@ public class QueryUtils {
             e.printStackTrace();
         }
         Elements element;
-        String imageUrl;
+        ArrayList<String> imageUrls = new ArrayList<>();
 
         element= doc.getElementsByAttributeValueContaining("ng-controller","pageStateController as psCtrl");
         String galleryUrls = element.first().getElementsByAttributeValue("name", "mmy-gallery-lightbox").attr("images");
 
         if(galleryUrls.isEmpty()){
             element= doc.getElementsByAttributeValueContaining("class", "slide nonDraggableImage");
-            imageUrl = element.first().attr("src");
+            imageUrls.add(element.first().attr("src"));
         }else {
+            String[] urls = galleryUrls.split("\"[&quot|&quot;,&quot;|&quot;]\"");
+            imageUrls.add(urls[0].substring(2));
+            for(int i =1; i < urls.length-1; i++) {
+                imageUrls.add(urls[i]);
+            }
+            String lastUrl = urls[urls.length-1];
+            imageUrls.add(lastUrl.substring(0,lastUrl.length()-2));
 
-            imageUrl = galleryUrls.split("\"[&quot|&quot;,&quot;|&quot;]\"")[0];
-            imageUrl = imageUrl.substring(2);
         }
 
-        Bitmap carImage = null;
+        Bitmap[] carImages = new Bitmap[imageUrls.size()];
 
+        for(int i = 0; i < carImages.length; i++)
         try {
-            InputStream inputStream = createUrl(imageUrl).openStream();
-            carImage =BitmapFactory.decodeStream(inputStream);
+            InputStream inputStream = createUrl(imageUrls.get(i)).openStream();
+            carImages[i] =BitmapFactory.decodeStream(inputStream);
             inputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return carImage;
+        return carImages;
     }
 
 
     private static boolean isQueryFailed(Element element){
         //All failed querys have a title of only Cars.com rather than the name of the vehicle
-        if(element.text().equals("Cars.com")){
-            return true;
-        }else{
-            return false;
-        }
+        return element.text().equals("Cars.com");
 
     }
 }

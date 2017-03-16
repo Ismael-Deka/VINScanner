@@ -2,6 +2,8 @@ package com.example.vinscanner;
 
 import android.graphics.Bitmap;
 
+import java.util.ArrayList;
+
 /**
  * Created by Ismael on 2/21/2017.
  */
@@ -13,21 +15,23 @@ public class Car {
     private String mMake;
     private String mModel;
     private String mYear;
-    private String mTrim;
-    private Bitmap mCarImage;
+    private Bitmap mCarImage[];
+    private ArrayList<CarAttribute> mAttributes;
 
-    public Car(int newErrorCode, String newMake,String newModel, String newYear, String newVin,String newTrim,Bitmap newImage){
+    public Car(int newErrorCode, String newMake,String newModel, String newYear, String newVin,Bitmap[] newImage,ArrayList<CarAttribute> newAttributes){
 
         mErrorCode = newErrorCode;
         mMake = newMake.substring(0,1)+newMake.substring(1).toLowerCase();
         mModel = newModel;
         mYear = newYear;
         mVin = newVin;
-        mTrim = newTrim;
+        mAttributes = newAttributes;
         mCarImage = newImage;
 
 
     }
+
+
 
     public int getErrorCode() {
         return mErrorCode;
@@ -52,7 +56,11 @@ public class Car {
         return mVin;
     }
 
-    public Bitmap getCarImage() {
+    public Bitmap[] getCarImages() {
         return mCarImage;
+    }
+
+    public ArrayList<CarAttribute> getAttributes() {
+        return mAttributes;
     }
 }

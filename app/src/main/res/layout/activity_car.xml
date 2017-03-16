@@ -30,14 +30,27 @@
                 app:expandedTitleMarginStart="48dp"
                 app:expandedTitleTextAppearance="@style/TextAppearance.AppCompat.Title"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed">
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:adjustViewBounds="true">
+                    <LinearLayout
+                        android:id="@+id/gallery"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        >
 
+                    </LinearLayout>
+                </HorizontalScrollView>
                 <ImageView
                     android:id="@+id/image"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:fitsSystemWindows="true"
                     android:scaleType="centerCrop"
-                    app:layout_collapseMode="parallax" />
+                    app:layout_collapseMode="parallax"
+                    android:contentDescription="@string/vehicle_image" />
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="88dp"
@@ -68,7 +81,28 @@
             android:layout_height="match_parent"
             android:clipToPadding="false"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
+           <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+               android:orientation="vertical">
+            <android.support.v7.widget.CardView
+                android:id="@+id/vin_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                app:cardElevation="6dp"
+                app:cardUseCompatPadding="true">
+                <TextView
+                    android:id="@+id/vin_number"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="30dp"
+                    android:textSize="20sp"/>
 
+
+
+
+            </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView
                 android:id="@+id/card"
@@ -87,14 +121,22 @@
                         android:id="@+id/description"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:textSize="16sp"
                         android:layout_margin="30dp"
                         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
                 </LinearLayout>
             </android.support.v7.widget.CardView>
-
+           </LinearLayout>
         </android.support.v4.widget.NestedScrollView>
     </android.support.design.widget.CoordinatorLayout>
+    <TextView
+        android:id="@+id/no_internet"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="@string/no_internet_connection"
+        android:textSize="16sp"/>
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"

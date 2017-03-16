@@ -1,32 +1,18 @@
 package com.example.vinscanner;
 
-import android.content.Intent;
-import android.graphics.BitmapFactory;
-import android.graphics.ImageFormat;
+import android.content.res.Configuration;
 import android.graphics.Rect;
-import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.os.Bundle;
-import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.RotateAnimation;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
-import com.google.android.gms.common.api.CommonStatusCodes;
-import com.google.android.gms.vision.Frame;
-import com.google.android.gms.vision.barcode.Barcode;
-import com.google.android.gms.vision.barcode.BarcodeDetector;
-
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +25,8 @@ public class VinScannerActivity extends AppCompatActivity {
     private Camera mCamera;
     private SurfaceHolder mHolder;
     private ImageButton mFlashlight;
-    private int mRotation = -1;
+    private VinScanner mScanner;
+    private int mOrientation = -1;
     private boolean isFlashLightOn = false;
 
 
@@ -50,6 +37,8 @@ public class VinScannerActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         setContentView(R.layout.activity_vin_scanner);
 
+        mScanner = new VinScanner(this);
+
         mPreview = (SurfaceView) findViewById(R.id.camera_preview);
         mHolder = mPreview.getHolder();
         mHolder.addCallback(callBack);
@@ -57,13 +46,13 @@ public class VinScannerActivity extends AppCompatActivity {
         ImageButton backButton = (ImageButton) findViewById(R.id.back_button);
         mFlashlight = (ImageButton) findViewById(R.id.flashlight);
 
-
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(VinScannerActivity.this.getParentActivityIntent());
             }
         });
+
 
         mFlashlight.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,26 +76,18 @@ public class VinScannerActivity extends AppCompatActivity {
                     float y = event.getY();
 
                     doTouchFocus(createFocusArea(x,y));
+
                 }
                 return true;
             }
         });
 
-        Toast.makeText(this, "Tap to Focus Camera.", Toast.LENGTH_LONG).show();
     }
 
-    private void rotateFlashButton(float endRotation){
-        // Create an animation instance
-        Animation an = new RotateAnimation(0.0f, endRotation);
-
-        // Set the animation's parameters
-        an.setDuration(1000);               // duration in ms
-        an.setRepeatCount(0);                // -1 = infinite repeated
-        an.setRepeatMode(Animation.REVERSE); // reverses each repeat
-        an.setFillAfter(true);               // keep rotation after animation
-
-        mFlashlight.setAnimation(an);
-        mFlashlight.animate();
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        doHandleRotation();
+        super.onConfigurationChanged(newConfig);
     }
 
     private void turnOnLight(ImageButton flashlight){
@@ -181,60 +162,15 @@ public class VinScannerActivity extends AppCompatActivity {
         int result;
         result = (info.orientation-degrees+360)%360;
         mCamera.setDisplayOrientation(result);
-        mRotation = result;
 
-    }
 
-    Camera.PreviewCallback previewCallback = new Camera.PreviewCallback() {
-        @Override
-        public void onPreviewFrame(byte[] bytes, Camera camera) {
-            doHandleRotation();
-            byte[] data = formatFrame(bytes);
-            Frame frame = new Frame.Builder().setBitmap(BitmapFactory.decodeByteArray(data,0,data.length)).build();
-            detectBarcode(frame);
-        }
-    };
-
-    private byte[] formatFrame(byte[] bytes){
-        Camera.Size previewSize = mCamera.getParameters().getPreviewSize();
-        YuvImage yuvimage=new YuvImage(bytes, ImageFormat.NV21, previewSize.width, previewSize.height, null);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        yuvimage.compressToJpeg(new Rect(0, 0, previewSize.width, previewSize.height), 80, baos);
-
-        return baos.toByteArray();
     }
 
     @Override
     protected void onPause() {
-        mCamera.setPreviewCallback(null);
-        mCamera.stopPreview();
+
         turnOffLight(mFlashlight);
         super.onPause();
-    }
-
-    @Override
-    protected void onResume() {
-        if(mCamera != null) {
-            mCamera.setPreviewCallback(previewCallback);
-            mCamera.startPreview();
-        }
-        super.onResume();
-    }
-
-    private void detectBarcode(Frame frame){
-        BarcodeDetector detector = new BarcodeDetector.Builder(this).setBarcodeFormats(Barcode.CODE_39).build();
-        SparseArray<Barcode> barcodes = detector.detect(frame);
-        if(barcodes.size() > 0) {
-            Intent i = new Intent();
-            Barcode barcode = barcodes.valueAt(0);
-            i.putExtra("barcode", barcode);
-
-            vibrate();
-
-            Log.e(TAG,"Barcode Found.");
-            setResult(CommonStatusCodes.SUCCESS, i);
-            finish();
-        }
     }
 
     private void startCamera(){
@@ -246,7 +182,7 @@ public class VinScannerActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        mCamera.setPreviewCallback(previewCallback);
+        mCamera.setPreviewCallback(mScanner);
         mCamera.startPreview();
     }
 
@@ -297,14 +233,6 @@ public class VinScannerActivity extends AppCompatActivity {
 
 
     }
-
-    private void vibrate(){
-        Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
-        if(vibrator.hasVibrator()) {
-            vibrator.vibrate(500);
-        }
-    }
-
 
 
 

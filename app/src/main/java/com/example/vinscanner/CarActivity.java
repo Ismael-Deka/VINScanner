@@ -7,14 +7,14 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,8 +26,8 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
     private Car mCar;
     private CollapsingToolbarLayout mToolbarLayout;
     private String mVin;
-    private ImageView mImage;
-    private LinearLayout mGallery;
+    private TabLayout mTabDots;
+    private ViewPager mGallery;
     private TextView mVinNumber;
     private TextView mDescription;
     private AppBarLayout mAppBarLayout;
@@ -46,14 +46,14 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
 
 
         mDescription = (TextView) findViewById(R.id.description);
-        mImage = (ImageView) findViewById(R.id.image);
         mToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         mAppBarLayout = (AppBarLayout) findViewById(R.id.app_bar_layout);
         mCardView = (CardView) findViewById(R.id.card);
         mVinNumber = (TextView) findViewById(R.id.vin_number);
         mVinCard = (CardView) findViewById(R.id.vin_card);
-        mGallery = (LinearLayout) findViewById(R.id.gallery);
+        mGallery = (ViewPager) findViewById(R.id.gallery);
+        mTabDots = (TabLayout) findViewById(R.id.tabDots);
         TextView mNoInternetView = (TextView) findViewById(R.id.no_internet);
 
 
@@ -106,15 +106,15 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
 
             if(car.getCarImages() != null) {
                 Bitmap[] galleryImages = car.getCarImages();
-                ImageView image;
-                for(int i = 0; i < galleryImages.length;i++) {
-                    image = new ImageView(CarActivity.this);
-                    image.setAdjustViewBounds(true);
-                    image.setImageBitmap(galleryImages[i]);
-                    mGallery.addView(image);
+                CarImagePagerAdapter carImageAdapter = new CarImagePagerAdapter(CarActivity.this,galleryImages);
+
+                mGallery.setAdapter(carImageAdapter);
+                if(galleryImages.length > 1)
+                    mTabDots.setupWithViewPager(mGallery);
                 }
+
                 mAppBarLayout.setExpanded(true,true);
-            }
+
 
             mVinNumber.setText("Vin: "+car.getVin());
 

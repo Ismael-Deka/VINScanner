@@ -31,13 +31,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mEditText = (EditText) findViewById(R.id.edit_text);
-        Button mButton = (Button) findViewById(R.id.button);
-        Button mScanButton = (Button) findViewById(R.id.scan_button);
+        Button enter = (Button) findViewById(R.id.enter);
+        Button scanButton = (Button) findViewById(R.id.scan_button);
+        Button clear = (Button) findViewById(R.id.clear);
 
         mEditText.setText("JTNBE46K373015722");
 
 
-        mButton.setOnClickListener(new View.OnClickListener() {
+        enter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mVin = mEditText.getText().toString();
@@ -46,8 +47,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        clear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mEditText.setText("");
+            }
+        });
 
-        mScanButton.setOnClickListener(new View.OnClickListener() {
+
+        scanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){

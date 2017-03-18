@@ -28,6 +28,7 @@ import static com.google.android.gms.wearable.DataMap.TAG;
 @SuppressWarnings("deprecation")
 public class VinScanner implements Camera.PreviewCallback {
     private Activity mParentActivity;
+    private boolean mIsVibrateOnce = false;
 
     public VinScanner(Activity newParentActivity){
         mParentActivity = newParentActivity;
@@ -54,8 +55,8 @@ public class VinScanner implements Camera.PreviewCallback {
             Intent i = new Intent();
             Barcode barcode = barcodes.valueAt(0);
             i.putExtra("barcode", barcode);
-
-            vibrate();
+            if(!mIsVibrateOnce)
+                vibrate();
 
             Log.e(TAG,"Barcode Found.");
             mParentActivity.setResult(CommonStatusCodes.SUCCESS, i);
@@ -66,6 +67,7 @@ public class VinScanner implements Camera.PreviewCallback {
             Vibrator vibrator = (Vibrator)mParentActivity.getSystemService(VIBRATOR_SERVICE);
             if(vibrator.hasVibrator()) {
                 vibrator.vibrate(500);
+                mIsVibrateOnce = true;
             }
         }
 }

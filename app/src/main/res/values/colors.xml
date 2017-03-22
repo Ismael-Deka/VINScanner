@@ -7,7 +7,12 @@
     <color name="flashlight_on">#FFEB3B</color>
     <color name="flashlight_off">#212121</color>
 
-    <color name="scanner_line">#D50000</color>
+
+    <color name="gradient_action_start">#50000000</color>
+    <color name="gradient_action_center">#1D000000</color>
+
+    <color name="gradient_overlay_start">#26000000</color>
+    <color name="gradient_overlay_center">#0C000000</color>
 
     <color name="black_overlay">#66000000</color>
 </resources>

@@ -42,6 +42,13 @@
         android:layout_height="wrap_content"
         android:text="@string/scan_from_camera"
         android:layout_below="@id/enter"/>
+    <ListView
+        android:id="@+id/car_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/scan_button">
+
+    </ListView>
 
 
 </RelativeLayout>

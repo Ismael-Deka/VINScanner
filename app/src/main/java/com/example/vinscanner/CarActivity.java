@@ -1,12 +1,15 @@
 package com.example.vinscanner;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -19,7 +22,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.vinscanner.db.CarContract;
+
 import java.util.ArrayList;
+
+import static com.example.vinscanner.R.id.fab;
 
 public class CarActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Car>{
 
@@ -34,6 +41,7 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
     private ProgressBar mProgressBar;
     private CardView mCardView;
     private CardView mVinCard;
+    private FloatingActionButton mFab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +62,7 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
         mVinCard = (CardView) findViewById(R.id.vin_card);
         mGallery = (ViewPager) findViewById(R.id.gallery);
         mTabDots = (TabLayout) findViewById(R.id.tabDots);
+        mFab = (FloatingActionButton) findViewById(fab);
         TextView mNoInternetView = (TextView) findViewById(R.id.no_internet);
 
 
@@ -61,8 +70,10 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
         mCardView.setVisibility(View.INVISIBLE);
         mNoInternetView.setVisibility(View.INVISIBLE);
         mVinCard.setVisibility(View.INVISIBLE);
+        mFab.setVisibility(View.INVISIBLE);
 
         mVin = getIntent().getStringExtra("Vin");
+
 
         mAppBarLayout.setExpanded(false,false);
         if(isNetworkAvailable()) {
@@ -71,8 +82,49 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
             mNoInternetView.setVisibility(View.VISIBLE);
             mProgressBar.setVisibility(View.INVISIBLE);
         }
+
     }
 
+    private void saveCar() {
+
+        ContentValues values = new ContentValues();
+        values.put(CarContract.CarEntry.COLUMN_CAR_MAKE, mCar.getMake());
+        values.put(CarContract.CarEntry.COLUMN_CAR_MODEL, mCar.getModel());
+        values.put(CarContract.CarEntry.COLUMN_CAR_YEAR, mCar.getYear());
+        values.put(CarContract.CarEntry.COLUMN_CAR_VIN, mCar.getVin());
+
+        Uri newUri = getContentResolver().insert(CarContract.CarEntry.CONTENT_URI, values);
+
+
+        if (newUri == null) {
+            // If the new content URI is null, then there was an error with insertion.
+            Toast.makeText(this, "Failed to Save",
+                    Toast.LENGTH_SHORT).show();
+        } else {
+
+            Toast.makeText(this, "Saved",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void deleteCar(Uri uri) {
+
+        if (uri!= null) {
+
+            int rowsDeleted = getContentResolver().delete(uri, null, null);
+
+            if (rowsDeleted == 0) {
+                Toast.makeText(this, "Failed to Delete Vehicle",
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Deleted",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        // Close the activity
+        finish();
+    }
     private boolean validateVin(int errorCode){
 
         if(errorCode != 0){
@@ -86,6 +138,8 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
     }
 
 
+
+
     @Override
     public Loader<Car> onCreateLoader(int i, Bundle bundle) {
         return new CarLoader(this,mVin);
@@ -97,9 +151,15 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
 
         if(validateVin(car.getErrorCode())) {
 
+            mCar = car;
+            if(CarActivity.this.getIntent().getParcelableExtra("Uri") != null){
+                mFab.setImageResource(R.drawable.ic_remove_white_24dp);
+            }
+
             mProgressBar.setVisibility(View.INVISIBLE);
             mCardView.setVisibility(View.VISIBLE);
             mVinCard.setVisibility(View.VISIBLE);
+            mFab.setVisibility(View.VISIBLE);
 
 
             mToolbarLayout.setTitle(car.getYear()+" "+car.getMake()+" "+car.getModel());
@@ -127,6 +187,21 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
                 value = attributes.get(i).getValue();
                 mDescription.setText(mDescription.getText()+key+": "+value+"\n"+"\n");
             }
+
+            mFab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Uri currentUri = CarActivity.this.getIntent().getParcelableExtra("Uri");
+                    if(currentUri!=null){
+                        deleteCar(currentUri);
+                    }else{
+                        saveCar();
+                    }
+
+
+                }
+            });
+
 
 
         }

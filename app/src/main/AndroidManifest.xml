@@ -34,6 +34,10 @@
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+        <provider
+            android:authorities="com.example.vinscanner"
+            android:name=".db.CarProvider"
+            android:exported="false"/>
     </application>
 
 </manifest>

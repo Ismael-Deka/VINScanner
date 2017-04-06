@@ -3,6 +3,7 @@ package com.example.vinscanner;
 
 import android.app.LoaderManager;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -106,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
 
 
 }
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(final int requestCode, int resultCode, Intent data) {
         if (resultCode == CommonStatusCodes.SUCCESS) {
             Barcode vinBacode;
             if(data != null) {
@@ -117,7 +118,35 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
                 }
                 startCarActivity(null);
             }
+        }else if(resultCode == RESULT_OK){
+            final String make = data.getStringExtra("make");
+            final String model = data.getStringExtra("model");
+            final String year = data.getStringExtra("year");
+            final String vin = data.getStringExtra("vin");
+            Snackbar.make(mEditText,"Vehicle Deleted.", Snackbar.LENGTH_LONG).
+                    setAction("Undo", new View.OnClickListener() {
+
+                        @Override
+                        public void onClick(View v) {
+
+                            Uri uri = restoreCar(make,model,year,vin);
+                            startCarActivity(uri);
+                        }
+
+                    }).show();
         }
+    }
+
+    private Uri restoreCar(String make, String model, String year, String vin){
+
+        ContentValues values = new ContentValues();
+        values.put(CarContract.CarEntry.COLUMN_CAR_MAKE, make);
+        values.put(CarContract.CarEntry.COLUMN_CAR_MODEL, model);
+        values.put(CarContract.CarEntry.COLUMN_CAR_YEAR, year);
+        values.put(CarContract.CarEntry.COLUMN_CAR_VIN, vin);
+
+        return getContentResolver().insert(CarContract.CarEntry.CONTENT_URI, values);
+
     }
 
     private void startCarActivity(final Uri uri){
@@ -125,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
             Intent carIntent = new Intent(MainActivity.this,CarActivity.class);
             carIntent.putExtra("Vin",mVin);
             carIntent.putExtra("Uri", uri);
-            startActivity(carIntent);
+            startActivityForResult(carIntent,2);
         }
 
 

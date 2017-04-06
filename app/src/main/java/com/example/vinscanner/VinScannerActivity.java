@@ -26,7 +26,6 @@ public class VinScannerActivity extends AppCompatActivity {
     private SurfaceHolder mHolder;
     private ImageButton mFlashlight;
     private VinScanner mScanner;
-    private int mOrientation = -1;
     private boolean isFlashLightOn = false;
 
 

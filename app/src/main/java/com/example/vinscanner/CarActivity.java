@@ -2,6 +2,7 @@ package com.example.vinscanner;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -117,13 +118,17 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
                 Toast.makeText(this, "Failed to Delete Vehicle",
                         Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, "Deleted",
-                        Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent();
+                intent.putExtra("make",mCar.getMake());
+                intent.putExtra("model",mCar.getModel());
+                intent.putExtra("year",mCar.getYear());
+                intent.putExtra("vin",mVin);
+                setResult(RESULT_OK,intent);
+                finish();
             }
         }
 
-        // Close the activity
-        finish();
+
     }
     private boolean validateVin(int errorCode){
 
@@ -153,7 +158,7 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
 
             mCar = car;
             if(CarActivity.this.getIntent().getParcelableExtra("Uri") != null){
-                mFab.setImageResource(R.drawable.ic_remove_white_24dp);
+                mFab.setImageResource(R.drawable.ic_delete_forever_white_24dp);
             }
 
             mProgressBar.setVisibility(View.INVISIBLE);
@@ -195,6 +200,7 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
                     if(currentUri!=null){
                         deleteCar(currentUri);
                     }else{
+                        mFab.setImageResource(R.drawable.ic_delete_forever_white_24dp);
                         saveCar();
                     }
 

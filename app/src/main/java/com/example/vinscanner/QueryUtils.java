@@ -4,6 +4,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import com.example.vinscanner.car.Car;
+import com.example.vinscanner.car.CarAttribute;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,60 +33,39 @@ import static com.example.vinscanner.MainActivity.LOG_TAG;
 
 public class QueryUtils {
 
-    private static final String NHTSA_REQUEST_URL_BASE = "https://vpic.nhtsa.dot.gov/api/vehicles/decodevinextended/";
+    private static final String NHTSA_VIN_DECODE_URL_BASE = "https://vpic.nhtsa.dot.gov/api/vehicles/decodevinextended/";
+    private static final String NHTSA_RECALL_URL_BASE = "https://one.nhtsa.gov/webapi/api/Recalls/vehicle/modelyear/";
     private static final String CARS_DOT_COM_URL_BASE = "https://www.cars.com/research/";
     private static boolean isTrimIncluded = false;
 
 
     public static Car extractCar(String vin) {
-        int errorCode = -1;
-        String make = "";
-        String model = "";
-        String year = "";
-        String trim = "";
-        ArrayList<CarAttribute> attributes = new ArrayList<>();
+        Car decodedCar = new Car(-1,null,null,null,null,null,null,null,null);
+        Bitmap[] carImages;
 
 
     Log.e(LOG_TAG,vin);
         try {
 
             //Forming complete Url from Base Url, VIN number, and format parameter
-            String requestUrl =NHTSA_REQUEST_URL_BASE + vin + "?format=json";
+            String vinUrl = NHTSA_VIN_DECODE_URL_BASE + vin + "?format=json";
 
-            String jsonResponse = makeHttpRequest(createUrl(requestUrl));
+            String jsonResponse = makeHttpRequest(createUrl(vinUrl));
 
+            Car car = getCarInfo(jsonResponse);
 
-            JSONObject reader = new JSONObject(jsonResponse);
-            JSONArray arr = reader.getJSONArray("Results");
-            for(int i = 0; i < arr.length();i++){
-                reader = arr.getJSONObject(i);
-                String variable = reader.getString("Variable");
-                String value = reader.getString("Value");
-                switch(variable){
-                    case "Error Code":
-                        errorCode = Integer.parseInt(reader.getString("ValueId"));
-                    case "Make":
-                        make = value;
-                        break;
-                    case "Model":
-                        model = value;
-                        break;
-                    case "Model Year":
-                        year = value;
-                        break;
-                    case "Trim":
-                        trim = value;
-                    default:
-                    if(!value.equals("null") )
-                        attributes.add(new CarAttribute(variable,value));
+            String recallUrl = NHTSA_RECALL_URL_BASE+car.getYear()+"/make/"+car.getMake()+"/model/"+car.getModel()+"?format=json";
+            jsonResponse = makeHttpRequest(createUrl(recallUrl));
 
-                }
+            ArrayList<CarAttribute> recallInfo = getRecallInfo(jsonResponse);
 
-            }
+            carImages = getCarImage(car.getMake(),car.getModel(),car.getYear(),car.getTrim(),car.getErrorCode());
+
+            decodedCar = new Car(car.getErrorCode(),car.getMake(),car.getModel(),car.getTrim(),car.getYear(),vin,carImages,car.getAttributes(),recallInfo);
 
 
 
-        } catch (JSONException e) {
+    } catch (JSONException e) {
             // If an error is thrown when executing any of the above statements in the "try" block,
             // catch the exception here, so the app doesn't crash. Print a log message
             // with the message from the exception.
@@ -93,13 +75,7 @@ public class QueryUtils {
             Log.e("QueryUtils", "Problem reading from Input Stream", e);
         }
 
-        Bitmap[] carImages = getCarImage(make,model,year,trim,errorCode);
-
-        if(isTrimIncluded&&!trim.equals("null")){
-            return new Car(errorCode, make, model + " " + trim, year, vin, carImages, attributes);
-        }else {
-            return new Car(errorCode, make, model, year, vin, carImages, attributes);
-        }
+        return decodedCar;
     }
 
     private static URL createUrl(String requestUrl) {
@@ -112,6 +88,64 @@ public class QueryUtils {
             Log.e(LOG_TAG, "Error with creating URL ", e);
         }
         return url;
+    }
+
+    private static ArrayList<CarAttribute> getRecallInfo(String jsonResponse) throws JSONException {
+        ArrayList<CarAttribute> recallInfo = new ArrayList<>();
+        JSONObject reader = new JSONObject(jsonResponse);
+        JSONArray arr = reader.getJSONArray("Results");
+
+        for(int i = 0; i < arr.length();i++){
+            reader = arr.getJSONObject(i);
+            String component = reader.getString("Component");
+            String summary = reader.getString("Summary");
+            recallInfo.add(new CarAttribute(component,summary));
+        }
+
+        return recallInfo;
+    }
+
+    private static Car getCarInfo(String jsonResponse) throws JSONException {
+        int errorCode = -1;
+        String make = "";
+        String model = "";
+        String year = "";
+        String trim = "";
+
+        ArrayList<CarAttribute> attributes = new ArrayList<>();
+        JSONObject reader = new JSONObject(jsonResponse);
+        JSONArray arr = reader.getJSONArray("Results");
+
+        for(int i = 0; i < arr.length();i++) {
+            reader = arr.getJSONObject(i);
+            String variable = reader.getString("Variable");
+            String value = reader.getString("Value");
+            switch (variable) {
+                case "Error Code":
+                    errorCode = Integer.parseInt(reader.getString("ValueId"));
+                case "Make":
+                    make = value;
+                    break;
+                case "Model":
+                    model = value;
+                    break;
+                case "Model Year":
+                    year = value;
+                    break;
+                case "Trim":
+                    trim = value;
+                default:
+                    if (!value.equals("null"))
+                        attributes.add(new CarAttribute(variable, value));
+
+            }
+        }
+
+        if (isTrimIncluded && !trim.equals("null")) {
+            return new Car(errorCode, make, model + " " + trim,trim, year, null, null, attributes,null);
+        } else {
+            return new Car(errorCode, make, model,null, year, null, null, attributes,null);
+        }
     }
 
     private static String makeHttpRequest(URL url) throws IOException {

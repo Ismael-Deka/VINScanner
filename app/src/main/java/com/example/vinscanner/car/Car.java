@@ -1,4 +1,4 @@
-package com.example.vinscanner;
+package com.example.vinscanner.car;
 
 import android.graphics.Bitmap;
 
@@ -15,18 +15,26 @@ public class Car {
     private String mMake;
     private String mModel;
     private String mYear;
+    private String mTrim;
     private Bitmap mCarImage[];
-    private ArrayList<CarAttribute> mAttributes;
+    private ArrayList<CarAttribute> mInfo;
+    private ArrayList<CarAttribute> mRecallInfo;
 
-    public Car(int newErrorCode, String newMake,String newModel, String newYear, String newVin,Bitmap[] newImage,ArrayList<CarAttribute> newAttributes){
+
+    public Car(int newErrorCode, String newMake,String newModel, String newTrim, String newYear, String newVin,Bitmap[] newImage,
+               ArrayList<CarAttribute> newAttributes,ArrayList<CarAttribute> newRecallAttribute){
 
         mErrorCode = newErrorCode;
-        mMake = newMake.substring(0,1)+newMake.substring(1).toLowerCase();
+        if(newMake != null) {
+            mMake = newMake.substring(0, 1) + newMake.substring(1).toLowerCase();
+        }
         mModel = newModel;
+        mTrim = newTrim;
         mYear = newYear;
         mVin = newVin;
-        mAttributes = newAttributes;
+        mInfo = newAttributes;
         mCarImage = newImage;
+        mRecallInfo = newRecallAttribute;
 
 
     }
@@ -47,6 +55,10 @@ public class Car {
         return mModel;
     }
 
+    public String getTrim() {
+        return mTrim;
+    }
+
     public String getYear(){
 
         return mYear;
@@ -61,6 +73,10 @@ public class Car {
     }
 
     public ArrayList<CarAttribute> getAttributes() {
-        return mAttributes;
+        return mInfo;
+    }
+
+    public ArrayList<CarAttribute> getRecallInfo() {
+        return mRecallInfo;
     }
 }

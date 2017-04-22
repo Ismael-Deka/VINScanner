@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -16,16 +17,14 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.vinscanner.car.Car;
 import com.example.vinscanner.db.CarContract;
-
-import java.util.ArrayList;
 
 import static com.example.vinscanner.R.id.fab;
 
@@ -35,13 +34,11 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
     private CollapsingToolbarLayout mToolbarLayout;
     private String mVin;
     private TabLayout mTabDots;
+    private TabLayout mTabs;
+    private ViewPager mViewPager;
     private ViewPager mGallery;
-    private TextView mVinNumber;
-    private TextView mDescription;
     private AppBarLayout mAppBarLayout;
     private ProgressBar mProgressBar;
-    private CardView mCardView;
-    private CardView mVinCard;
     private FloatingActionButton mFab;
 
     @Override
@@ -54,26 +51,27 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-        mDescription = (TextView) findViewById(R.id.description);
         mToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         mAppBarLayout = (AppBarLayout) findViewById(R.id.app_bar_layout);
-        mCardView = (CardView) findViewById(R.id.card);
-        mVinNumber = (TextView) findViewById(R.id.vin_number);
-        mVinCard = (CardView) findViewById(R.id.vin_card);
         mGallery = (ViewPager) findViewById(R.id.gallery);
         mTabDots = (TabLayout) findViewById(R.id.tabDots);
         mFab = (FloatingActionButton) findViewById(fab);
+        mTabs = (TabLayout) findViewById(R.id.sliding_tabs);
+        mViewPager = (ViewPager) findViewById(R.id.viewpager);
+
         TextView mNoInternetView = (TextView) findViewById(R.id.no_internet);
 
 
         mProgressBar.setVisibility(View.VISIBLE);
-        mCardView.setVisibility(View.INVISIBLE);
         mNoInternetView.setVisibility(View.INVISIBLE);
-        mVinCard.setVisibility(View.INVISIBLE);
         mFab.setVisibility(View.INVISIBLE);
+        mTabs.setVisibility(View.INVISIBLE);
+        mViewPager.setVisibility(View.INVISIBLE);
 
         mVin = getIntent().getStringExtra("Vin");
+
+
 
 
         mAppBarLayout.setExpanded(false,false);
@@ -162,10 +160,17 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
             }
 
             mProgressBar.setVisibility(View.INVISIBLE);
-            mCardView.setVisibility(View.VISIBLE);
-            mVinCard.setVisibility(View.VISIBLE);
             mFab.setVisibility(View.VISIBLE);
+            mTabs.setVisibility(View.VISIBLE);
+            mViewPager.setVisibility(View.VISIBLE);
 
+
+            CarInfoPagerAdapter carInfoPagerAdapter = new CarInfoPagerAdapter(getSupportFragmentManager());
+            carInfoPagerAdapter.setCar(car);
+            mViewPager.setAdapter(carInfoPagerAdapter);
+            mTabs.setTabTextColors(Color.parseColor("#A8A19E"), Color.WHITE);
+            mTabs.setSelectedTabIndicatorColor(Color.WHITE);
+            mTabs.setupWithViewPager(mViewPager);
 
             mToolbarLayout.setTitle(car.getYear()+" "+car.getMake()+" "+car.getModel());
 
@@ -179,19 +184,6 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
                 }
 
                 mAppBarLayout.setExpanded(true,true);
-
-
-            mVinNumber.setText("Vin: "+car.getVin());
-
-            ArrayList<CarAttribute> attributes = car.getAttributes();
-            String key;
-            String value;
-
-            for(int i = 3; i < attributes.size(); i++){
-                key = attributes.get(i).getKey();
-                value = attributes.get(i).getValue();
-                mDescription.setText(mDescription.getText()+key+": "+value+"\n"+"\n");
-            }
 
             mFab.setOnClickListener(new View.OnClickListener() {
                 @Override

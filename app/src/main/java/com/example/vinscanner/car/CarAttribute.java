@@ -1,4 +1,4 @@
-package com.example.vinscanner;
+package com.example.vinscanner.car;
 
 /**
  * Created by Ismael on 3/16/2017.

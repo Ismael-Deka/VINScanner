@@ -3,6 +3,8 @@ package com.example.vinscanner;
 import android.content.Context;
 import android.support.v4.content.AsyncTaskLoader;
 
+import com.example.vinscanner.car.Car;
+
 /**
  * Created by Ismael on 2/21/2017.
  */

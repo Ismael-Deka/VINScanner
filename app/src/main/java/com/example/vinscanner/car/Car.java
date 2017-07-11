@@ -2,6 +2,8 @@ package com.example.vinscanner.car;
 
 import android.graphics.Bitmap;
 
+import com.example.vinscanner.RecallAttribute;
+
 import java.util.ArrayList;
 
 /**
@@ -18,11 +20,11 @@ public class Car {
     private String mTrim;
     private Bitmap mCarImage[];
     private ArrayList<CarAttribute> mInfo;
-    private ArrayList<CarAttribute> mRecallInfo;
+    private ArrayList<RecallAttribute> mRecallInfo;
 
 
     public Car(int newErrorCode, String newMake,String newModel, String newTrim, String newYear, String newVin,Bitmap[] newImage,
-               ArrayList<CarAttribute> newAttributes,ArrayList<CarAttribute> newRecallAttribute){
+               ArrayList<CarAttribute> newAttributes,ArrayList<RecallAttribute> newRecallAttribute){
 
         mErrorCode = newErrorCode;
         if(newMake != null) {
@@ -76,7 +78,7 @@ public class Car {
         return mInfo;
     }
 
-    public ArrayList<CarAttribute> getRecallInfo() {
+    public ArrayList<RecallAttribute> getRecallInfo() {
         return mRecallInfo;
     }
 }

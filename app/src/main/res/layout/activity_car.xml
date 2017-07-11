@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.vinscanner.CarActivity">
+    tools:context="com.example.vinscanner.ui.CarActivity">
     <android.support.design.widget.CoordinatorLayout
         android:id="@+id/root_layout"
         android:layout_width="match_parent"

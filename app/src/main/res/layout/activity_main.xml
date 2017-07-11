@@ -4,7 +4,7 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.vinscanner.MainActivity">
+    tools:context="com.example.vinscanner.ui.MainActivity">
 
     <RelativeLayout
         android:layout_width="match_parent"

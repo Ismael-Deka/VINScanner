@@ -1,4 +1,4 @@
-package com.example.vinscanner;
+package com.example.vinscanner.ui;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -23,6 +23,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.vinscanner.CarImagePagerAdapter;
+import com.example.vinscanner.CarLoader;
+import com.example.vinscanner.R;
 import com.example.vinscanner.car.Car;
 import com.example.vinscanner.db.CarContract;
 

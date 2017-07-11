@@ -25,7 +25,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
-import static com.example.vinscanner.MainActivity.LOG_TAG;
+import static com.example.vinscanner.ui.MainActivity.LOG_TAG;
 
 /**
  * Created by Ismael on 2/21/2017.
@@ -55,14 +55,19 @@ public class QueryUtils {
             Car car = getCarInfo(jsonResponse);
 
             String recallUrl = NHTSA_RECALL_URL_BASE+car.getYear()+"/make/"+car.getMake()+"/model/"+car.getModel()+"?format=json";
+
+            Log.e(LOG_TAG,recallUrl);
             jsonResponse = makeHttpRequest(createUrl(recallUrl));
 
-            ArrayList<CarAttribute> recallInfo = getRecallInfo(jsonResponse);
+            ArrayList<RecallAttribute> recallInfo = getRecallInfo(jsonResponse);
 
             carImages = getCarImage(car.getMake(),car.getModel(),car.getYear(),car.getTrim(),car.getErrorCode());
 
-            decodedCar = new Car(car.getErrorCode(),car.getMake(),car.getModel(),car.getTrim(),car.getYear(),vin,carImages,car.getAttributes(),recallInfo);
-
+            if(isTrimIncluded && !car.getTrim().equals("null"))
+                decodedCar = new Car(car.getErrorCode(),car.getMake(),car.getModel()+" "+car.getTrim(),car.getTrim(),car.getYear(),vin,carImages,car.getAttributes(),recallInfo);
+            else {
+                decodedCar = new Car(car.getErrorCode(), car.getMake(), car.getModel(), car.getTrim(), car.getYear(), vin, carImages, car.getAttributes(), recallInfo);
+            }
 
 
     } catch (JSONException e) {
@@ -90,16 +95,21 @@ public class QueryUtils {
         return url;
     }
 
-    private static ArrayList<CarAttribute> getRecallInfo(String jsonResponse) throws JSONException {
-        ArrayList<CarAttribute> recallInfo = new ArrayList<>();
+    private static ArrayList<RecallAttribute> getRecallInfo(String jsonResponse) throws JSONException {
+        ArrayList<RecallAttribute> recallInfo = new ArrayList<>();
         JSONObject reader = new JSONObject(jsonResponse);
         JSONArray arr = reader.getJSONArray("Results");
-
+        String component;
+        String summary;
+        String consequence;
+        String remedy;
         for(int i = 0; i < arr.length();i++){
             reader = arr.getJSONObject(i);
-            String component = reader.getString("Component");
-            String summary = reader.getString("Summary");
-            recallInfo.add(new CarAttribute(component,summary));
+            component = reader.getString("Component");
+            summary = reader.getString("Summary");
+            consequence = reader.getString("Conequence");
+            remedy = reader.getString("Remedy");
+            recallInfo.add(new RecallAttribute(component,summary,consequence,remedy));
         }
 
         return recallInfo;
@@ -141,11 +151,9 @@ public class QueryUtils {
             }
         }
 
-        if (isTrimIncluded && !trim.equals("null")) {
-            return new Car(errorCode, make, model + " " + trim,trim, year, null, null, attributes,null);
-        } else {
-            return new Car(errorCode, make, model,null, year, null, null, attributes,null);
-        }
+
+            return new Car(errorCode, make, model,trim, year, null, null, attributes,null);
+
     }
 
     private static String makeHttpRequest(URL url) throws IOException {

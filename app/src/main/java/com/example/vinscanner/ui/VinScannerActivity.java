@@ -1,4 +1,4 @@
-package com.example.vinscanner;
+package com.example.vinscanner.ui;
 
 import android.content.res.Configuration;
 import android.graphics.Rect;
@@ -12,6 +12,9 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageButton;
+
+import com.example.vinscanner.R;
+import com.example.vinscanner.VinScanner;
 
 import java.io.IOException;
 import java.util.ArrayList;

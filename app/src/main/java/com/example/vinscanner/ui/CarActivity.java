@@ -3,6 +3,7 @@ package com.example.vinscanner.ui;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
@@ -33,6 +34,7 @@ import static com.example.vinscanner.R.id.fab;
 
 public class CarActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Car>{
 
+    private Uri mUri;
     private Car mCar;
     private CollapsingToolbarLayout mToolbarLayout;
     private String mVin;
@@ -43,6 +45,7 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
     private AppBarLayout mAppBarLayout;
     private ProgressBar mProgressBar;
     private FloatingActionButton mFab;
+    private boolean mIsVehicleSaved;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +76,8 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
         mViewPager.setVisibility(View.INVISIBLE);
 
         mVin = getIntent().getStringExtra("Vin");
+
+        mIsVehicleSaved = isVehicleSaved();
 
 
 
@@ -106,6 +111,7 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
 
             Toast.makeText(this, "Saved",
                     Toast.LENGTH_SHORT).show();
+            mUri = newUri;
         }
     }
 
@@ -158,7 +164,8 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
         if(validateVin(car.getErrorCode())) {
 
             mCar = car;
-            if(CarActivity.this.getIntent().getParcelableExtra("Uri") != null){
+
+            if(mIsVehicleSaved){
                 mFab.setImageResource(R.drawable.ic_delete_forever_white_24dp);
             }
 
@@ -191,9 +198,9 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
             mFab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Uri currentUri = CarActivity.this.getIntent().getParcelableExtra("Uri");
-                    if(currentUri!=null){
-                        deleteCar(currentUri);
+
+                    if(mUri!=null){
+                        deleteCar(mUri);
                     }else{
                         mFab.setImageResource(R.drawable.ic_delete_forever_white_24dp);
                         saveCar();
@@ -221,5 +228,23 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    private boolean isVehicleSaved(){
+        Uri uri = CarContract.CarEntry.CONTENT_URI;
+        String[] projection = {CarContract.CarEntry._ID, CarContract.CarEntry.COLUMN_CAR_VIN};
+        String selection = CarContract.CarEntry.COLUMN_CAR_VIN + " like '" + mVin+"'";
+        Cursor cursor = getContentResolver().query(uri,projection,selection,null,null);
+        if (cursor != null&&cursor.getCount()>0) {
+            cursor.moveToFirst();
+            int idColumn = cursor.getColumnIndex(CarContract.CarEntry._ID);
+            int id = cursor.getInt(idColumn);
+            mUri = Uri.withAppendedPath(uri, id+"");
+            return true;
+        }else{
+            if(cursor != null)
+                cursor.close();
+            return false;
+        }
     }
 }

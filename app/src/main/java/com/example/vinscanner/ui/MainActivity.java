@@ -13,8 +13,8 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
@@ -24,8 +24,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.FilterQueryProvider;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -50,13 +48,10 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
 
     private CarCursorAdapter mAdapter;
 
-    private EditText mEditText;
-
     private String mVin;
 
     private ListView mCarList;
 
-    private SimpleCursorAdapter mCursorAdapter;
 
 
     @Override
@@ -64,35 +59,13 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mEditText = (EditText) findViewById(R.id.edit_text);
-        Button enter = (Button) findViewById(R.id.enter);
-        Button scanButton = (Button) findViewById(R.id.scan_button);
-        Button clear = (Button) findViewById(R.id.clear);
+        FloatingActionButton scanButton = (FloatingActionButton) findViewById(R.id.scan_button);
         mCarList = (ListView) findViewById(R.id.car_list);
 
         mAdapter = new CarCursorAdapter(this,null);
 
         mCarList.setAdapter(mAdapter);
 
-
-        mEditText.setText("JTNBE46K373015722");
-
-
-        enter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mVin = mEditText.getText().toString();
-                startCarActivity(null);
-
-            }
-        });
-
-        clear.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mEditText.setText("");
-            }
-        });
 
 
         scanButton.setOnClickListener(new View.OnClickListener() {
@@ -119,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
                 Cursor cursor = (Cursor)o;
                 int vinIndex = cursor.getColumnIndex(CarContract.CarEntry.COLUMN_CAR_VIN);
                 mVin = cursor.getString(vinIndex);
+                cursor.close();
 
                 Uri uri = ContentUris.withAppendedId(CarContract.CarEntry.CONTENT_URI, id);
                 startCarActivity(uri);
@@ -140,46 +114,29 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
         mSearchMenuItem = menu.findItem(R.id.search);
         mSearchView = (SearchView) mSearchMenuItem.getActionView();
         mSearchView.setQueryHint("Enter Vehicle, or VIN...");
+        mSearchView.setSubmitButtonEnabled(true);
 
-        String[] from = {CarContract.CarEntry.COLUMN_CAR_YEAR,CarContract.CarEntry.COLUMN_CAR_MAKE
-                ,CarContract.CarEntry.COLUMN_CAR_MODEL,CarContract.CarEntry.COLUMN_CAR_VIN};
-        int[] to = {R.id.year,R.id.make,R.id.model,R.id.vin};
 
-        mCursorAdapter = new SimpleCursorAdapter(this, R.layout.cursor_list_item,null,from,to,0);
-        mCursorAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+
+        mAdapter.setFilterQueryProvider(new FilterQueryProvider() {
             @Override
             public Cursor runQuery(CharSequence constraint) {
-                Cursor cursor = getCursor(constraint.toString());
+                Cursor cursor;
+                if(constraint != null && constraint.length()>0)
+                    cursor = getCursor(constraint.toString());
+                else
+                    cursor = restoreCursor();
 
                 return cursor;
             }
         });
-        mSearchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+        mSearchView.setOnCloseListener(new SearchView.OnCloseListener() {
             @Override
-            public boolean onSuggestionSelect(int position) {
-                return false;
-            }
-
-            @Override
-            public boolean onSuggestionClick(int position) {
-                Object o = mCursorAdapter.getItem(position);
-                Cursor cursor = (Cursor)o;
-                int yearIndex = cursor.getColumnIndex(CarContract.CarEntry.COLUMN_CAR_YEAR);
-                int makeIndex = cursor.getColumnIndex(CarContract.CarEntry.COLUMN_CAR_MAKE);
-                int modelIndex = cursor.getColumnIndex(CarContract.CarEntry.COLUMN_CAR_MODEL);
-
-
-                String year = cursor.getString(yearIndex);
-                String make = cursor.getString(makeIndex);
-                String model = cursor.getString(modelIndex);
-
-                mSearchView.setQuery(year+" "+make+" "+model,false);
-
-                cursor.close();
+            public boolean onClose() {
+                mSearchView.setQuery("",false);
                 return true;
             }
         });
-        mSearchView.setSuggestionsAdapter(mCursorAdapter);
 
         mSearchView.setSearchableInfo(searchManager.
                 getSearchableInfo(getComponentName()));
@@ -206,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
             final String model = data.getStringExtra("model");
             final String year = data.getStringExtra("year");
             final String vin = data.getStringExtra("vin");
-            Snackbar.make(mEditText,"Vehicle Deleted.", Snackbar.LENGTH_LONG).
+            Snackbar.make(mCarList,"Vehicle Deleted.", Snackbar.LENGTH_LONG).
                     setAction("Undo", new View.OnClickListener() {
 
                         @Override
@@ -296,20 +253,23 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        mCursorAdapter.getFilter().filter(newText);
-        mCursorAdapter.notifyDataSetChanged();
+        mAdapter.getFilter().filter(newText);
+        mAdapter.notifyDataSetChanged();
         if (TextUtils.isEmpty(newText)) {
-               mCarList.clearTextFilter();
+            mCarList.clearTextFilter();
+            mAdapter.swapCursor(restoreCursor());
         }
         else {
             mCarList.setFilterText(newText.toString());
+
         }
         return true;
     }
     private Cursor getCursor(String str) {
+
         Cursor mCursor;
         if (str == null  ||  str.length () == 0)  {
-            mCursor = mCursorAdapter.getCursor();
+            mCursor = mAdapter.getCursor();
         }
         else {
             Uri uri =  CarContract.CarEntry.CONTENT_URI;
@@ -327,7 +287,7 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
 
                 selection = CarContract.CarEntry.COLUMN_CAR_YEAR + " like '" +
                     query[0]+"%'" + " OR " + CarContract.CarEntry.COLUMN_CAR_MAKE + " like '% " + query[1] + " %'" + " OR " +
-                    CarContract.CarEntry.COLUMN_CAR_MODEL + " like '" + str + "%'";
+                    CarContract.CarEntry.COLUMN_CAR_MODEL + " like '" + query + "%'";
             }else {
                 String[] query = str.split(" ");
 
@@ -354,7 +314,7 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
         String model = carName[2];
 
         if (str == null ||  str.length () == 0)  {
-            mCursor = mCursorAdapter.getCursor();
+            mCursor = mAdapter.getCursor();
         }
         else {
             Uri uri =  CarContract.CarEntry.CONTENT_URI;
@@ -371,6 +331,16 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
             mCursor.moveToFirst();
         }
         return mCursor;
+    }
+
+    private Cursor restoreCursor(){
+        Uri uri =  CarContract.CarEntry.CONTENT_URI;
+        String[] projection = new String[]{CarContract.CarEntry._ID,CarContract.CarEntry.COLUMN_CAR_YEAR,CarContract.CarEntry.COLUMN_CAR_MAKE
+                ,CarContract.CarEntry.COLUMN_CAR_MODEL,CarContract.CarEntry.COLUMN_CAR_VIN};
+
+        return getContentResolver().query(uri, projection, null, null,
+                null);
+
     }
 
 }

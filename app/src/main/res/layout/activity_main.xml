@@ -8,49 +8,23 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin">
-        <EditText
-            android:id="@+id/edit_text"
-            android:hint="Enter VIN"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textCapCharacters"
-            />
+        android:layout_height="match_parent">
 
-            <Button
-                android:id="@+id/enter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/enter"
-                android:layout_below="@id/edit_text"/>
-            <Button
-                android:id="@+id/clear"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="clear"
-                android:layout_alignBaseline="@+id/enter"
-                android:layout_alignBottom="@+id/enter"
-                android:layout_toEndOf="@+id/enter" />
-
-
-
-            <Button
-                android:id="@+id/scan_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/scan_from_camera"
-                android:layout_below="@id/enter"/>
             <ListView
                 android:id="@+id/car_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@+id/scan_button">
+                android:padding="16dp"
+                >
 
             </ListView>
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/scan_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/ic_photo_camera_white_24dp"/>
     </RelativeLayout>
 
 

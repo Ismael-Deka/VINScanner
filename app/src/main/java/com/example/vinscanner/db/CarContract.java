@@ -44,6 +44,7 @@ public class CarContract {
         public final static String _ID = BaseColumns._ID;
 
 
+
         public final static String COLUMN_CAR_MAKE ="make";
 
 

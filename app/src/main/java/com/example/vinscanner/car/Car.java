@@ -18,13 +18,14 @@ public class Car {
     private String mModel;
     private String mYear;
     private String mTrim;
+    private Bitmap mLogo;
     private Bitmap mCarImage[];
     private ArrayList<CarAttribute> mInfo;
     private ArrayList<RecallAttribute> mRecallInfo;
 
 
     public Car(int newErrorCode, String newMake,String newModel, String newTrim, String newYear, String newVin,Bitmap[] newImage,
-               ArrayList<CarAttribute> newAttributes,ArrayList<RecallAttribute> newRecallAttribute){
+               ArrayList<CarAttribute> newAttributes,ArrayList<RecallAttribute> newRecallAttribute, Bitmap newLogo){
 
         mErrorCode = newErrorCode;
         if(newMake != null) {
@@ -33,6 +34,7 @@ public class Car {
         mModel = newModel;
         mTrim = newTrim;
         mYear = newYear;
+        mLogo = newLogo;
         mVin = newVin;
         mInfo = newAttributes;
         mCarImage = newImage;
@@ -80,5 +82,9 @@ public class Car {
 
     public ArrayList<RecallAttribute> getRecallInfo() {
         return mRecallInfo;
+    }
+
+    public Bitmap getLogo() {
+        return mLogo;
     }
 }

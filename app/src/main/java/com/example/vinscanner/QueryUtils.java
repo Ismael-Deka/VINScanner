@@ -12,7 +12,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
@@ -36,11 +35,12 @@ public class QueryUtils {
     private static final String NHTSA_VIN_DECODE_URL_BASE = "https://vpic.nhtsa.dot.gov/api/vehicles/decodevinextended/";
     private static final String NHTSA_RECALL_URL_BASE = "https://one.nhtsa.gov/webapi/api/Recalls/vehicle/modelyear/";
     private static final String CARS_DOT_COM_URL_BASE = "https://www.cars.com/research/";
+    private static final String NHTSA_VEHICLE_LOGO_BASE = "https://vpic.nhtsa.dot.gov/decoder/Images/Logos/";
     private static boolean isTrimIncluded = false;
 
 
     public static Car extractCar(String vin) {
-        Car decodedCar = new Car(-1,null,null,null,null,null,null,null,null);
+        Car decodedCar = new Car(-1,null,null,null,null,null,null,null,null,null);
         Bitmap[] carImages;
 
 
@@ -64,9 +64,9 @@ public class QueryUtils {
             carImages = getCarImage(car.getMake(),car.getModel(),car.getYear(),car.getTrim(),car.getErrorCode());
 
             if(isTrimIncluded && !car.getTrim().equals("null"))
-                decodedCar = new Car(car.getErrorCode(),car.getMake(),car.getModel()+" "+car.getTrim(),car.getTrim(),car.getYear(),vin,carImages,car.getAttributes(),recallInfo);
+                decodedCar = new Car(car.getErrorCode(),car.getMake(),car.getModel()+" "+car.getTrim(),car.getTrim(),car.getYear(),vin,carImages,car.getAttributes(),recallInfo,getCarLogo(car.getMake()));
             else {
-                decodedCar = new Car(car.getErrorCode(), car.getMake(), car.getModel(), car.getTrim(), car.getYear(), vin, carImages, car.getAttributes(), recallInfo);
+                decodedCar = new Car(car.getErrorCode(), car.getMake(), car.getModel(), car.getTrim(), car.getYear(), vin, carImages, car.getAttributes(), recallInfo,getCarLogo(car.getMake()));
             }
 
 
@@ -152,7 +152,8 @@ public class QueryUtils {
         }
 
 
-            return new Car(errorCode, make, model,trim, year, null, null, attributes,null);
+
+        return new Car(errorCode, make, model,trim, year, null, null, attributes,null,null);
 
     }
 
@@ -221,27 +222,36 @@ public class QueryUtils {
 
             doc = Jsoup.connect(CARS_DOT_COM_URL_BASE+make+"-"+model+"-"+year).get();
             Log.e(LOG_TAG,CARS_DOT_COM_URL_BASE+make+"-"+model+"-"+year);
-            if(isQueryFailed(doc.getElementsByTag("title").first())){
-                //Some Models in the NHTSA Database have space in between certain phases(i.e. MITSUBISHI 3000 GT instead of 3000GT)
-                //This is to correct for those differences
-                doc = Jsoup.connect(CARS_DOT_COM_URL_BASE+make+"-"+model.replace("_","")+"-"+year).get();
-                Log.e(LOG_TAG,CARS_DOT_COM_URL_BASE+make+"-"+model.replace("_","")+"-"+year);
-            }
-            if(isQueryFailed(doc.getElementsByTag("title").first())){
-                //Some Model on Cars.com required the trim as well as the model.
-                //This statement includes the trim in the request.
-                doc = Jsoup.connect(CARS_DOT_COM_URL_BASE+make.toLowerCase()+"-"+model.toLowerCase()+"_"+trim+"-"+year).get();
-                Log.e(LOG_TAG,CARS_DOT_COM_URL_BASE+make.toLowerCase()+"-"+model.toLowerCase()+"_"+trim+"-"+year);
-                isTrimIncluded = true;
-            }
-            if(isQueryFailed(doc.getElementsByTag("title").first())){
-                //if all other query methods fail.
-                return null;
-            }
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+        if(doc == null){
+            try {
+                //Some Models in the NHTSA Database have space in between certain phases(i.e. MITSUBISHI 3000 GT instead of 3000GT)
+                //This is to correct for those differences
+                doc = Jsoup.connect(CARS_DOT_COM_URL_BASE+make+"-"+model.replace("_","")+"-"+year).get();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Log.e(LOG_TAG,CARS_DOT_COM_URL_BASE+make+"-"+model.replace("_","")+"-"+year);
+        }
+        if(doc == null){
+            try {
+                //Some Model on Cars.com required the trim as well as the model.
+                //This statement includes the trim in the request.
+                doc = Jsoup.connect(CARS_DOT_COM_URL_BASE+make.toLowerCase()+"-"+model.toLowerCase()+"_"+trim+"-"+year).get();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Log.e(LOG_TAG,CARS_DOT_COM_URL_BASE+make.toLowerCase()+"-"+model.toLowerCase()+"_"+trim+"-"+year);
+            isTrimIncluded = true;
+        }
+        if (doc == null){
+            //if all other query methods fail.
+            return null;
+        }
+
         Elements element;
         ArrayList<String> imageUrls = new ArrayList<>();
 
@@ -277,9 +287,19 @@ public class QueryUtils {
     }
 
 
-    private static boolean isQueryFailed(Element element){
-        //All failed querys have a title of only Cars.com rather than the name of the vehicle
-        return element.text().equals("Cars.com");
 
+
+    public static Bitmap getCarLogo(String make){
+        Bitmap logo = null;
+        Log.e(LOG_TAG,NHTSA_VEHICLE_LOGO_BASE+make+".jpg");
+        try {
+            InputStream inputStream = createUrl(NHTSA_VEHICLE_LOGO_BASE+make+".jpg").openStream();
+            logo =BitmapFactory.decodeStream(inputStream);
+            inputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Log.e(LOG_TAG,(logo == null)+"");
+        return logo;
     }
 }

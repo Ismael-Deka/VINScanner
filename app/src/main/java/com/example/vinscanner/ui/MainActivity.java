@@ -147,6 +147,19 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.menu:
+                deleteAllCars();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+
     protected void onActivityResult(final int requestCode, int resultCode, Intent data) {
         if (resultCode == CommonStatusCodes.SUCCESS) {
             Barcode vinBarcode;
@@ -187,6 +200,12 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
 
         return getContentResolver().insert(CarContract.CarEntry.CONTENT_URI, values);
 
+    }
+    private void deleteAllCars(){
+        int i = getContentResolver().delete(CarContract.CarEntry.CONTENT_URI,null,null);
+        if(i>=0){
+            Toast.makeText(this,i+"",Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void startCarActivity(final Uri uri){

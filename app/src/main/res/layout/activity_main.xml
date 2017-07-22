@@ -14,7 +14,7 @@
                 android:id="@+id/car_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="16dp"
+                android:padding="9dp"
                 >
 
             </ListView>
@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
-            android:src="@drawable/ic_photo_camera_white_24dp"/>
+            android:src="@drawable/ic_barcode_scan_white_36dp"/>
     </RelativeLayout>
 
 

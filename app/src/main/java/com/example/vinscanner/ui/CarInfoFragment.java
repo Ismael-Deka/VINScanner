@@ -1,11 +1,13 @@
 package com.example.vinscanner.ui;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.vinscanner.R;
@@ -39,6 +41,9 @@ public class CarInfoFragment extends Fragment {
             value = attributes.get(i).getValue();
             description.setText(description.getText()+key+": "+value+"\n"+"\n");
         }
+        Bitmap logo = mCar.getLogo();
+        ImageView logoImage = (ImageView) rootView.findViewById(R.id.logo);
+        logoImage.setImageBitmap(logo);
 
         return rootView;
     }

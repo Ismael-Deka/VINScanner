@@ -2,6 +2,7 @@ package com.example.vinscanner.ui;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -29,6 +30,10 @@ import com.example.vinscanner.CarLoader;
 import com.example.vinscanner.R;
 import com.example.vinscanner.car.Car;
 import com.example.vinscanner.db.CarContract;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import static com.example.vinscanner.R.id.fab;
 
@@ -95,12 +100,14 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
     private void saveCar() {
 
         ContentValues values = new ContentValues();
+
         values.put(CarContract.CarEntry.COLUMN_CAR_MAKE, mCar.getMake());
         values.put(CarContract.CarEntry.COLUMN_CAR_MODEL, mCar.getModel());
         values.put(CarContract.CarEntry.COLUMN_CAR_YEAR, mCar.getYear());
         values.put(CarContract.CarEntry.COLUMN_CAR_VIN, mCar.getVin());
 
         Uri newUri = getContentResolver().insert(CarContract.CarEntry.CONTENT_URI, values);
+
 
 
         if (newUri == null) {
@@ -111,8 +118,34 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
 
             Toast.makeText(this, "Saved",
                     Toast.LENGTH_SHORT).show();
+            saveCarLogo();
+
             mUri = newUri;
         }
+    }
+    private String saveCarLogo(){
+        ContextWrapper cw = new ContextWrapper(getApplicationContext());
+
+        File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+        File mypath=new File(directory,mCar.getMake()+".jpg");
+
+        Bitmap bmp = mCar.getLogo();
+
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(mypath);
+            // Use the compress method on the BitMap object to write image to the OutputStream
+            bmp.compress(Bitmap.CompressFormat.PNG, 100, fos);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return directory.getAbsolutePath();
     }
 
     private void deleteCar(Uri uri) {
@@ -173,6 +206,7 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
             mFab.setVisibility(View.VISIBLE);
             mTabs.setVisibility(View.VISIBLE);
             mViewPager.setVisibility(View.VISIBLE);
+
 
 
             CarInfoPagerAdapter carInfoPagerAdapter = new CarInfoPagerAdapter(getSupportFragmentManager());

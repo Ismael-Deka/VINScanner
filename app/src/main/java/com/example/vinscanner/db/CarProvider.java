@@ -118,6 +118,7 @@ public class CarProvider extends ContentProvider {
             throw new IllegalArgumentException("Car requires a vin");
         }
 
+
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
         long id = database.insert(CarContract.CarEntry.TABLE_NAME, null, values);
@@ -144,10 +145,12 @@ public class CarProvider extends ContentProvider {
         switch (match) {
             case CARS:
                 // Delete all rows that match the selection and selection args
+                Log.e("provider","all cars");
                 rowsDeleted = database.delete(CarContract.CarEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             case CAR_ID:
                 // Delete a single row given by the ID in the URI
+                Log.e("provider","all cars");
                 selection = CarContract.CarEntry._ID + "=?";
                 selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
                 rowsDeleted = database.delete(CarContract.CarEntry.TABLE_NAME, selection, selectionArgs);

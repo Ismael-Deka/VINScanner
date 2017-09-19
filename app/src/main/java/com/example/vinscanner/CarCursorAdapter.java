@@ -47,33 +47,33 @@ public class CarCursorAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
 
+        if(!cursor.isClosed()) {
+            CircleImageView logoImageView = (CircleImageView) view.findViewById(R.id.list_logo);
+            TextView nameTextView = (TextView) view.findViewById(R.id.car_name);
+            TextView vinTextView = (TextView) view.findViewById(R.id.car_vin);
 
-        CircleImageView logoImageView = (CircleImageView) view.findViewById(R.id.list_logo);
-        TextView nameTextView = (TextView) view.findViewById(R.id.car_name);
-        TextView vinTextView= (TextView) view.findViewById(R.id.car_vin);
-
-        int yearIndex = cursor.getColumnIndex(CarContract.CarEntry.COLUMN_CAR_YEAR);
-        int makeIndex = cursor.getColumnIndex(CarContract.CarEntry.COLUMN_CAR_MAKE);
-        int modelIndex = cursor.getColumnIndex(CarContract.CarEntry.COLUMN_CAR_MODEL);
-        int vinIndex = cursor.getColumnIndex(CarContract.CarEntry.COLUMN_CAR_VIN);
+            int yearIndex = cursor.getColumnIndex(CarContract.CarEntry.COLUMN_CAR_YEAR);
+            int makeIndex = cursor.getColumnIndex(CarContract.CarEntry.COLUMN_CAR_MAKE);
+            int modelIndex = cursor.getColumnIndex(CarContract.CarEntry.COLUMN_CAR_MODEL);
+            int vinIndex = cursor.getColumnIndex(CarContract.CarEntry.COLUMN_CAR_VIN);
 
 
-        String year = cursor.getString(yearIndex);
-        final String make = cursor.getString(makeIndex);
-        String model = cursor.getString(modelIndex);
-        String vin = cursor.getString(vinIndex);
+            String year = cursor.getString(yearIndex);
+            final String make = cursor.getString(makeIndex);
+            String model = cursor.getString(modelIndex);
+            String vin = cursor.getString(vinIndex);
 
-        Bitmap bmp = getCarlogo(make,context);
-        if(bmp != null){
-            logoImageView.setImageBitmap(bmp);
+            Bitmap bmp = getCarlogo(make, context);
+            if (bmp != null) {
+                logoImageView.setImageBitmap(bmp);
+            }
+
+
+            String newMake = make.substring(0, 1) + make.substring(1).toLowerCase();
+            String carName = year + " " + newMake + " " + model;
+            nameTextView.setText(carName);
+            vinTextView.setText(vin);
         }
-
-
-        String newMake = make.substring(0,1)+make.substring(1).toLowerCase();
-        String carName = year+" "+newMake+" "+model;
-        nameTextView.setText(carName);
-        vinTextView.setText(vin);
-
 
 
 

@@ -1,6 +1,7 @@
 package com.example.vinscanner.ui;
 
 
+import android.Manifest;
 import android.app.LoaderManager;
 import android.app.SearchManager;
 import android.content.ContentUris;
@@ -13,8 +14,11 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
@@ -41,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
 
     public static final String LOG_TAG = MainActivity.class.getName();
 
+    private static final int PERMISSIONS_REQUEST_CAPTURE_IMAGE = 1;
 
     private SearchView mSearchView;
 
@@ -71,13 +76,26 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
         scanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
+
+                if (ContextCompat.checkSelfPermission(MainActivity.this,
+                        Manifest.permission.CAMERA)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    // User may have declined earlier, ask Android if we should show him a reason
+
+
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.CAMERA)) {
+                        // show an explanation to the user
+                        // Good practise: don't block thread after the user sees the explanation, try again to request the permission.
+                    } else {
+                        // request the permission.
+                        // CALLBACK_NUMBER is a integer constants
+                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CAMERA}, PERMISSIONS_REQUEST_CAPTURE_IMAGE);
+                        // The callback method gets the result of the request.
+                    }
+                } else {
+
                     Intent cameraIntent = new Intent(MainActivity.this,VinScannerActivity.class);
                     startActivityForResult(cameraIntent, 1888);
-                }else{
-                    Snackbar snackbar = Snackbar.make(findViewById(R.id.activity_main),
-                            "Device doesn't have a camera.", Snackbar.LENGTH_LONG);
-                    snackbar.show();
                 }
 
             }
@@ -92,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
                 Cursor cursor = (Cursor)o;
                 int vinIndex = cursor.getColumnIndex(CarContract.CarEntry.COLUMN_CAR_VIN);
                 mVin = cursor.getString(vinIndex);
-                cursor.close();
+
 
                 Uri uri = ContentUris.withAppendedId(CarContract.CarEntry.CONTENT_URI, id);
                 startCarActivity(uri);
@@ -103,6 +121,27 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
 
 
 }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_CAPTURE_IMAGE: {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted
+
+                    Intent cameraIntent = new Intent(MainActivity.this,VinScannerActivity.class);
+                    startActivityForResult(cameraIntent, 1888);
+
+
+                } else {
+                    // permission denied
+
+                    Log.d("", "permission denied");
+                }
+                return;
+            }
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -242,8 +281,10 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
+    protected void onDestroy() {
+        //mAdapter.getCursor().close();
+        super.onDestroy();
+
     }
 
     @Override

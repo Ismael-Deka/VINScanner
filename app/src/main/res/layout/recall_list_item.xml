@@ -1,23 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:padding="16dp">
 
     <android.support.v7.widget.CardView
+        android:id="@+id/recall_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="16dp"
+        >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingTop="20dp">
+            <TextView
+                android:id="@+id/campaign"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Campaign Number"
+                android:textSize="20sp"
+                android:padding="8dp"/>
             <TextView
                 android:id="@+id/component"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Component"
-                android:textSize="24sp"
+                android:fontFamily=""
+                android:textSize="16sp"
                 android:padding="8dp"/>
             <TextView
                 android:id="@+id/summary"
@@ -43,7 +59,22 @@
                 android:fontFamily=""
                 android:textSize="16sp"
                 android:padding="8dp"/>
-        </LinearLayout>
 
+
+        </LinearLayout>
+            <ImageView
+                android:id="@+id/show_more"
+                android:src="@drawable/ic_keyboard_arrow_down_black_24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"/>
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Date"
+                android:layout_alignParentRight="true"
+                android:padding="8dp"/>
+    </RelativeLayout>
     </android.support.v7.widget.CardView>
 </LinearLayout>

@@ -1,10 +1,12 @@
 package com.example.vinscanner;
 
 import android.content.Context;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -30,16 +32,27 @@ public class CarRecallAdapter extends RecyclerView.Adapter<CarRecallAdapter.View
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
         public TextView componentTextView;
+        public TextView campaignTextView;
         public TextView summaryTextView;
         public TextView consequenceTextView;
-        private TextView remedyTextView;
+        public TextView remedyTextView;
+        public TextView dateTextView;
+        public ImageView showMoreImage;
+        public CardView recallCardView;
+
+
 
         public ViewHolder(View itemView) {
             super(itemView);
             componentTextView = (TextView) itemView.findViewById(R.id.component);
-            summaryTextView = (TextView) itemView.findViewById(R.id.summary);
-            consequenceTextView = (TextView) itemView.findViewById(R.id.consequence);
-            remedyTextView = (TextView) itemView.findViewById(R.id.remedy);
+            campaignTextView = (TextView) itemView.findViewById(R.id.campaign);
+            dateTextView = (TextView) itemView.findViewById(R.id.date);
+            summaryTextView = (TextView)itemView.findViewById(R.id.summary);
+            consequenceTextView = (TextView)itemView.findViewById(R.id.consequence);
+            remedyTextView = (TextView)itemView.findViewById(R.id.remedy);
+            showMoreImage = (ImageView)itemView.findViewById(R.id.show_more);
+            recallCardView = (CardView) itemView.findViewById(R.id.recall_card);
+
         }
     }
 
@@ -60,14 +73,49 @@ public class CarRecallAdapter extends RecyclerView.Adapter<CarRecallAdapter.View
         RecallAttribute info = mRecallInfo.get(position);
 
         TextView component = holder.componentTextView;
-        TextView summary = holder.summaryTextView;
-        TextView consequence = holder.consequenceTextView;
-        TextView remedy = holder.remedyTextView;
+        TextView campaign = holder.campaignTextView;
+        TextView date = holder.dateTextView;
+        final TextView summary = holder.summaryTextView;
+        final TextView consequence = holder.consequenceTextView;
+        final TextView remedy = holder.remedyTextView;
+        CardView cardView = holder.recallCardView;
+        final ImageView showMore = holder.showMoreImage;
 
-        component.setText(info.getComponent());
+
+
+
+        String infoComponent = info.getComponent();
+        infoComponent= infoComponent.substring(0,1)+infoComponent.substring(1,infoComponent.length()).toLowerCase();
+
+        component.setText(infoComponent);
+        campaign.setText("Campaign Number: "+info.getCampaignNumber());
+        date.setText(info.getDate());
         summary.setText(info.getSummary());
         consequence.setText(info.getConsequence());
         remedy.setText(info.getRemedy());
+
+        summary.setVisibility(View.GONE);
+        consequence.setVisibility(View.GONE);
+        remedy.setVisibility(View.GONE);
+
+        cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(summary.getVisibility() == View.GONE){
+                    summary.setVisibility(View.VISIBLE);
+                    consequence.setVisibility(View.VISIBLE);
+                    remedy.setVisibility(View.VISIBLE);
+                    showMore.setImageResource(R.drawable.ic_keyboard_arrow_up_black_24dp);
+                }else{
+                    summary.setVisibility(View.GONE);
+                    consequence.setVisibility(View.GONE);
+                    remedy.setVisibility(View.GONE);
+                    showMore.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
+                }
+            }
+        });
+
+
 
 
     }

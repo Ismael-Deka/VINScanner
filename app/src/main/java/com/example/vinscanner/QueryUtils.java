@@ -53,8 +53,13 @@ public class QueryUtils {
             String jsonResponse = makeHttpRequest(createUrl(vinUrl));
 
             Car car = getCarInfo(jsonResponse);
-
-            String recallUrl = NHTSA_RECALL_URL_BASE+car.getYear()+"/make/"+car.getMake()+"/model/"+car.getModel()+"?format=json";
+            String recallUrl;
+            if(car.getModel().contains(" ")) {
+                String model = car.getModel().replace(" ", "");
+                recallUrl = NHTSA_RECALL_URL_BASE + car.getYear() + "/make/" + car.getMake() + "/model/"+model+"?format=json";
+            }else {
+                recallUrl = NHTSA_RECALL_URL_BASE + car.getYear() + "/make/" + car.getMake() + "/model/"+car.getModel()+"?format=json";
+            }
 
             Log.e(LOG_TAG,recallUrl);
             jsonResponse = makeHttpRequest(createUrl(recallUrl));
@@ -99,17 +104,21 @@ public class QueryUtils {
         ArrayList<RecallAttribute> recallInfo = new ArrayList<>();
         JSONObject reader = new JSONObject(jsonResponse);
         JSONArray arr = reader.getJSONArray("Results");
+        String campaignNumber;
         String component;
         String summary;
         String consequence;
         String remedy;
+        String date;
         for(int i = 0; i < arr.length();i++){
             reader = arr.getJSONObject(i);
+            campaignNumber = reader.getString("NHTSACampaignNumber");
             component = reader.getString("Component");
             summary = reader.getString("Summary");
             consequence = reader.getString("Conequence");
             remedy = reader.getString("Remedy");
-            recallInfo.add(new RecallAttribute(component,summary,consequence,remedy));
+            date = reader.getString("ReportReceivedDate");
+            recallInfo.add(new RecallAttribute(campaignNumber,component,summary,consequence,remedy,date));
         }
 
         return recallInfo;

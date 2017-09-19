@@ -212,7 +212,7 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
             CarInfoPagerAdapter carInfoPagerAdapter = new CarInfoPagerAdapter(getSupportFragmentManager());
             carInfoPagerAdapter.setCar(car);
             mViewPager.setAdapter(carInfoPagerAdapter);
-            mTabs.setTabTextColors(Color.parseColor("#A8A19E"), Color.WHITE);
+            mTabs.setTabTextColors(Color.BLACK, Color.WHITE);
             mTabs.setSelectedTabIndicatorColor(Color.WHITE);
             mTabs.setupWithViewPager(mViewPager);
 

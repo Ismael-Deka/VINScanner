@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Ismael on 5/11/2017.
@@ -18,12 +19,15 @@ import java.util.ArrayList;
 public class CarRecallAdapter extends RecyclerView.Adapter<CarRecallAdapter.ViewHolder> {
 
     private ArrayList<RecallAttribute> mRecallInfo;
+    private HashMap<String,Boolean> isViewExpaned = new HashMap<>();
     private Context mContext;
 
     public CarRecallAdapter(ArrayList<RecallAttribute> newRecallInfo, Context newContext){
         mRecallInfo = newRecallInfo;
         mContext = newContext;
-
+        for(int i = 0; i < mRecallInfo.size();i++){
+            isViewExpaned.put(mRecallInfo.get(i).getCampaignNumber(),false);
+        }
     }
 
     public Context getContext() {
@@ -70,7 +74,8 @@ public class CarRecallAdapter extends RecyclerView.Adapter<CarRecallAdapter.View
     @Override
     public void onBindViewHolder(CarRecallAdapter.ViewHolder holder, int position) {
 
-        RecallAttribute info = mRecallInfo.get(position);
+        final RecallAttribute info = mRecallInfo.get(position);
+
 
         TextView component = holder.componentTextView;
         TextView campaign = holder.campaignTextView;
@@ -94,23 +99,35 @@ public class CarRecallAdapter extends RecyclerView.Adapter<CarRecallAdapter.View
         consequence.setText(info.getConsequence());
         remedy.setText(info.getRemedy());
 
-        summary.setVisibility(View.GONE);
-        consequence.setVisibility(View.GONE);
-        remedy.setVisibility(View.GONE);
+        if(isViewExpaned.get(info.getCampaignNumber())) {
+            summary.setVisibility(View.VISIBLE);
+            consequence.setVisibility(View.VISIBLE);
+            remedy.setVisibility(View.VISIBLE);
+            showMore.setImageResource(R.drawable.ic_keyboard_arrow_up_black_24dp);
+        }else {
+            summary.setVisibility(View.GONE);
+            consequence.setVisibility(View.GONE);
+            remedy.setVisibility(View.GONE);
+            showMore.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
+        }
 
         cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(summary.getVisibility() == View.GONE){
+                if(!isViewExpaned.get(info.getCampaignNumber())){
                     summary.setVisibility(View.VISIBLE);
                     consequence.setVisibility(View.VISIBLE);
                     remedy.setVisibility(View.VISIBLE);
                     showMore.setImageResource(R.drawable.ic_keyboard_arrow_up_black_24dp);
+                    setViewOpen(true,info.getCampaignNumber());
+
                 }else{
                     summary.setVisibility(View.GONE);
                     consequence.setVisibility(View.GONE);
                     remedy.setVisibility(View.GONE);
                     showMore.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
+                    setViewOpen(false,info.getCampaignNumber());
+
                 }
             }
         });
@@ -118,6 +135,11 @@ public class CarRecallAdapter extends RecyclerView.Adapter<CarRecallAdapter.View
 
 
 
+    }
+
+    public void setViewOpen(boolean isOpen,String c){
+        isViewExpaned.remove(c);
+        isViewExpaned.put(c,isOpen);
     }
 
     @Override

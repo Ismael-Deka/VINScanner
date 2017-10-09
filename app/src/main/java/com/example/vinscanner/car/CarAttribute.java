@@ -7,10 +7,12 @@ package com.example.vinscanner.car;
 public class CarAttribute {
     private String mKey;
     private String mValue;
+    private String mCategory;
 
-    public CarAttribute(String key, String value){
+    public CarAttribute(String key, String value, String category){
         mKey = key;
         mValue = value;
+        mCategory = category;
     }
 
     public String getKey() {
@@ -19,5 +21,9 @@ public class CarAttribute {
 
     public String getValue(){
         return mValue;
+    }
+
+    public String getCategory() {
+        return mCategory;
     }
 }

@@ -1,4 +1,4 @@
-package com.example.vinscanner;
+package com.example.vinscanner.adapter;
 
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.vinscanner.R;
 import com.example.vinscanner.db.CarContract;
 
 import java.io.File;

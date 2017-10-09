@@ -32,15 +32,17 @@ import static com.example.vinscanner.ui.MainActivity.LOG_TAG;
 
 public class QueryUtils {
 
+
     private static final String NHTSA_VIN_DECODE_URL_BASE = "https://vpic.nhtsa.dot.gov/api/vehicles/decodevinextended/";
     private static final String NHTSA_RECALL_URL_BASE = "https://one.nhtsa.gov/webapi/api/Recalls/vehicle/modelyear/";
     private static final String CARS_DOT_COM_URL_BASE = "https://www.cars.com/research/";
     private static final String NHTSA_VEHICLE_LOGO_BASE = "https://vpic.nhtsa.dot.gov/decoder/Images/Logos/";
     private static boolean isTrimIncluded = false;
+    private static String MSRP;
 
 
     public static Car extractCar(String vin) {
-        Car decodedCar = new Car(-1,null,null,null,null,null,null,null,null,null);
+        Car decodedCar = new Car(-1,null,null,null,null,null,null,null,null,null,null);
         Bitmap[] carImages;
 
 
@@ -69,9 +71,9 @@ public class QueryUtils {
             carImages = getCarImage(car.getMake(),car.getModel(),car.getYear(),car.getTrim(),car.getErrorCode());
 
             if(isTrimIncluded && !car.getTrim().equals("null"))
-                decodedCar = new Car(car.getErrorCode(),car.getMake(),car.getModel()+" "+car.getTrim(),car.getTrim(),car.getYear(),vin,carImages,car.getAttributes(),recallInfo,getCarLogo(car.getMake()));
+                decodedCar = new Car(car.getErrorCode(),car.getMake(),car.getModel()+" "+car.getTrim(),car.getTrim(),car.getYear(),vin,carImages,car.getAttributes(),recallInfo,getCarLogo(car.getMake()),MSRP);
             else {
-                decodedCar = new Car(car.getErrorCode(), car.getMake(), car.getModel(), car.getTrim(), car.getYear(), vin, carImages, car.getAttributes(), recallInfo,getCarLogo(car.getMake()));
+                decodedCar = new Car(car.getErrorCode(), car.getMake(), car.getModel(), car.getTrim(), car.getYear(), vin, carImages, car.getAttributes(), recallInfo,getCarLogo(car.getMake()),MSRP);
             }
 
 
@@ -112,13 +114,15 @@ public class QueryUtils {
         String date;
         for(int i = 0; i < arr.length();i++){
             reader = arr.getJSONObject(i);
-            campaignNumber = reader.getString("NHTSACampaignNumber");
-            component = reader.getString("Component");
-            summary = reader.getString("Summary");
-            consequence = reader.getString("Conequence");
-            remedy = reader.getString("Remedy");
-            date = reader.getString("ReportReceivedDate");
-            recallInfo.add(new RecallAttribute(campaignNumber,component,summary,consequence,remedy,date));
+            if(reader.has("NHTSAActionNumber")) {
+                campaignNumber = reader.getString("NHTSACampaignNumber");
+                component = reader.getString("Component");
+                summary = reader.getString("Summary");
+                consequence = reader.getString("Conequence");
+                remedy = reader.getString("Remedy");
+                date = reader.getString("ReportReceivedDate");
+                recallInfo.add(new RecallAttribute(campaignNumber, component, summary, consequence, remedy, date));
+            }
         }
 
         return recallInfo;
@@ -155,14 +159,14 @@ public class QueryUtils {
                     trim = value;
                 default:
                     if (!value.equals("null"))
-                        attributes.add(new CarAttribute(variable, value));
+                        attributes.add(new CarAttribute(variable, value,CarCategoryFinder.getCarCategory(variable)));
 
             }
         }
 
 
 
-        return new Car(errorCode, make, model,trim, year, null, null, attributes,null,null);
+        return new Car(errorCode, make, model,trim, year, null, null, attributes,null,null,null);
 
     }
 
@@ -266,6 +270,13 @@ public class QueryUtils {
 
         element= doc.getElementsByAttributeValueContaining("ng-controller","pageStateController as psCtrl");
         String galleryUrls = element.first().getElementsByAttributeValue("name", "mmy-gallery-lightbox").attr("images");
+
+        Elements msrp = doc.getElementsByAttributeValueContaining("itemprop","priceSpecification");
+        MSRP = "$"+msrp.attr("content");
+        if(MSRP.equals("$")){
+            MSRP = "N/A";
+        }
+
 
         if(galleryUrls.isEmpty()){
             element= doc.getElementsByAttributeValueContaining("class", "slide nonDraggableImage");

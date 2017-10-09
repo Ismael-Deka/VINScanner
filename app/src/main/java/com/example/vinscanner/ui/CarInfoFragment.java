@@ -1,24 +1,20 @@
 package com.example.vinscanner.ui;
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.example.vinscanner.R;
+import com.example.vinscanner.adapter.CarInfoAdapter;
 import com.example.vinscanner.car.Car;
-import com.example.vinscanner.car.CarAttribute;
-
-import java.util.ArrayList;
 
 
 public class CarInfoFragment extends Fragment {
-
     private Car mCar;
 
     @Nullable
@@ -27,23 +23,12 @@ public class CarInfoFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_car_info, container, false);
 
-        TextView vin = (TextView) rootView.findViewById(R.id.vin_number);
-        TextView description = (TextView) rootView.findViewById(R.id.description);
+        RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.info_list);
+        CarInfoAdapter infoAdapter = new CarInfoAdapter(mCar.getVin(),mCar.getMarketPrice(),mCar.getAttributes(),getContext());
 
-        vin.setText(mCar.getVin());
+        recyclerView.setAdapter(infoAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        ArrayList<CarAttribute> attributes = mCar.getAttributes();
-        String key;
-        String value;
-
-        for(int i = 3; i < attributes.size(); i++){
-            key = attributes.get(i).getKey();
-            value = attributes.get(i).getValue();
-            description.setText(description.getText()+key+": "+value+"\n"+"\n");
-        }
-        Bitmap logo = mCar.getLogo();
-        ImageView logoImage = (ImageView) rootView.findViewById(R.id.logo);
-        logoImage.setImageBitmap(logo);
 
         return rootView;
     }

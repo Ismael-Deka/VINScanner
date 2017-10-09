@@ -1,16 +1,22 @@
-package com.example.vinscanner;
+package com.example.vinscanner.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.vinscanner.R;
+import com.example.vinscanner.RecallAttribute;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import static com.example.vinscanner.R.id.date;
 
 /**
  * Created by Ismael on 5/11/2017.
@@ -50,7 +56,7 @@ public class CarRecallAdapter extends RecyclerView.Adapter<CarRecallAdapter.View
             super(itemView);
             componentTextView = (TextView) itemView.findViewById(R.id.component);
             campaignTextView = (TextView) itemView.findViewById(R.id.campaign);
-            dateTextView = (TextView) itemView.findViewById(R.id.date);
+            dateTextView = (TextView) itemView.findViewById(date);
             summaryTextView = (TextView)itemView.findViewById(R.id.summary);
             consequenceTextView = (TextView)itemView.findViewById(R.id.consequence);
             remedyTextView = (TextView)itemView.findViewById(R.id.remedy);
@@ -92,12 +98,12 @@ public class CarRecallAdapter extends RecyclerView.Adapter<CarRecallAdapter.View
         String infoComponent = info.getComponent();
         infoComponent= infoComponent.substring(0,1)+infoComponent.substring(1,infoComponent.length()).toLowerCase();
 
-        component.setText(infoComponent);
-        campaign.setText("Campaign Number: "+info.getCampaignNumber());
+        component.setText(Html.fromHtml("<b>Component:</b>"+"\n"+infoComponent));
+        campaign.setText(Html.fromHtml("<b>Campaign Number:</b> "+""+info.getCampaignNumber()+""));
         date.setText(info.getDate());
-        summary.setText(info.getSummary());
-        consequence.setText(info.getConsequence());
-        remedy.setText(info.getRemedy());
+        summary.setText(Html.fromHtml("<b>Summary:</b>"+"\n"+info.getSummary()));
+        consequence.setText(Html.fromHtml("<b>Consequence:</b>"+"\n"+info.getConsequence()));
+        remedy.setText(Html.fromHtml("<b>Remedy:</b>"+"\n"+info.getRemedy()));
 
         if(isViewExpaned.get(info.getCampaignNumber())) {
             summary.setVisibility(View.VISIBLE);

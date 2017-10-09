@@ -1,10 +1,12 @@
-package com.example.vinscanner.ui;
+package com.example.vinscanner.adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.example.vinscanner.car.Car;
+import com.example.vinscanner.ui.CarInfoFragment;
+import com.example.vinscanner.ui.CarRecallFragment;
 
 /**
  * Created by Ismael on 4/20/2017.

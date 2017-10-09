@@ -32,7 +32,7 @@ import android.widget.FilterQueryProvider;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.vinscanner.CarCursorAdapter;
+import com.example.vinscanner.adapter.CarCursorAdapter;
 import com.example.vinscanner.R;
 import com.example.vinscanner.db.CarContract;
 import com.google.android.gms.common.api.CommonStatusCodes;

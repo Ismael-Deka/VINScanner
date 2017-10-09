@@ -18,6 +18,7 @@ public class Car {
     private String mModel;
     private String mYear;
     private String mTrim;
+    private String mMarketPrice;
     private Bitmap mLogo;
     private Bitmap mCarImage[];
     private ArrayList<CarAttribute> mInfo;
@@ -25,7 +26,7 @@ public class Car {
 
 
     public Car(int newErrorCode, String newMake,String newModel, String newTrim, String newYear, String newVin,Bitmap[] newImage,
-               ArrayList<CarAttribute> newAttributes,ArrayList<RecallAttribute> newRecallAttribute, Bitmap newLogo){
+               ArrayList<CarAttribute> newAttributes,ArrayList<RecallAttribute> newRecallAttribute, Bitmap newLogo,String newMarketPrice){
 
         mErrorCode = newErrorCode;
         if(newMake != null) {
@@ -39,11 +40,15 @@ public class Car {
         mInfo = newAttributes;
         mCarImage = newImage;
         mRecallInfo = newRecallAttribute;
+        mMarketPrice = newMarketPrice;
 
 
     }
 
 
+    public String getMarketPrice() {
+        return mMarketPrice;
+    }
 
     public int getErrorCode() {
         return mErrorCode;

@@ -33,6 +33,12 @@ public class CarInfoFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+    }
+
     private void setCar(Car newCar) {
         mCar = newCar;
     }

@@ -126,7 +126,7 @@ public class CarInfoAdapter extends RecyclerView.Adapter<CarInfoAdapter.ViewHold
         for(int i = 0; i < info.size(); i++){
             key = info.get(i).getKey();
             value=info.get(i).getValue();
-            if(!value.equals("")) {
+            if(!value.equals("") && !attributes.getText().toString().contains(key)) {
                 attributes.append(Html.fromHtml("<b>" + key + "</b>" + ": " + value));
                 attributes.append("\n" + "\n");
             }

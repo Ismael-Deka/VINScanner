@@ -9,6 +9,7 @@ import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.example.vinscanner.R;
@@ -52,6 +53,7 @@ public class CarCursorAdapter extends CursorAdapter {
             CircleImageView logoImageView = (CircleImageView) view.findViewById(R.id.list_logo);
             TextView nameTextView = (TextView) view.findViewById(R.id.car_name);
             TextView vinTextView = (TextView) view.findViewById(R.id.car_vin);
+            CheckBox checkBoxView =(CheckBox) view.findViewById(R.id.car_list_checkbox);
 
             int yearIndex = cursor.getColumnIndex(CarContract.CarEntry.COLUMN_CAR_YEAR);
             int makeIndex = cursor.getColumnIndex(CarContract.CarEntry.COLUMN_CAR_MAKE);
@@ -74,23 +76,11 @@ public class CarCursorAdapter extends CursorAdapter {
             String carName = year + " " + newMake + " " + model;
             nameTextView.setText(carName);
             vinTextView.setText(vin);
+
         }
 
 
 
-        /*AsyncTask<Void,Void, Bitmap> asyncTask = new AsyncTask<Void, Void, Bitmap>() {
-            @Override
-            protected Bitmap doInBackground(Void... params) {
-                return QueryUtils.getCarLogo(make);
-            }
-        };
-        try {
-            logoImageView.setImageBitmap(asyncTask.execute().get());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }*/
     }
 
     private Bitmap getCarlogo(String make,Context c){

@@ -98,7 +98,7 @@ public class CarRecallAdapter extends RecyclerView.Adapter<CarRecallAdapter.View
         String infoComponent = info.getComponent();
         infoComponent= infoComponent.substring(0,1)+infoComponent.substring(1,infoComponent.length()).toLowerCase();
 
-        component.setText(Html.fromHtml("<b>Component:</b>"+"\n"+infoComponent));
+        component.setText(Html.fromHtml("<b>Recall Subject:</b>"+"\n"+infoComponent));
         campaign.setText(Html.fromHtml("<b>Campaign Number:</b> "+""+info.getCampaignNumber()+""));
         date.setText(info.getDate());
         summary.setText(Html.fromHtml("<b>Summary:</b>"+"\n"+info.getSummary()));

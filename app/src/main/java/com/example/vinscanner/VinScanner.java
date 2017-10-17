@@ -1,6 +1,5 @@
 package com.example.vinscanner;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
@@ -11,6 +10,7 @@ import android.os.Vibrator;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.example.vinscanner.ui.VinScannerActivity;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.barcode.Barcode;
@@ -27,10 +27,10 @@ import static com.google.android.gms.wearable.DataMap.TAG;
 
 @SuppressWarnings("deprecation")
 public class VinScanner implements Camera.PreviewCallback {
-    private Activity mParentActivity;
+    private VinScannerActivity mParentActivity;
     private boolean mIsVibrateOnce = false;
 
-    public VinScanner(Activity newParentActivity){
+    public VinScanner(VinScannerActivity newParentActivity){
         mParentActivity = newParentActivity;
     }
     @Override
@@ -54,6 +54,7 @@ public class VinScanner implements Camera.PreviewCallback {
         if(barcodes.size() > 0) {
             Intent i = new Intent();
             Barcode barcode = barcodes.valueAt(0);
+            mParentActivity.setBarcodeOutlineFound();
             i.putExtra("barcode", barcode);
             if(!mIsVibrateOnce)
                 vibrate();

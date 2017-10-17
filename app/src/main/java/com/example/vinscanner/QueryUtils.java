@@ -22,6 +22,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import static com.example.vinscanner.ui.MainActivity.LOG_TAG;
@@ -51,7 +52,7 @@ public class QueryUtils {
 
             //Forming complete Url from Base Url, VIN number, and format parameter
             String vinUrl = NHTSA_VIN_DECODE_URL_BASE + vin + "?format=json";
-
+            Log.e(LOG_TAG,vin);
             String jsonResponse = makeHttpRequest(createUrl(vinUrl));
 
             Car car = getCarInfo(jsonResponse);
@@ -114,15 +115,14 @@ public class QueryUtils {
         String date;
         for(int i = 0; i < arr.length();i++){
             reader = arr.getJSONObject(i);
-            if(reader.has("NHTSAActionNumber")) {
-                campaignNumber = reader.getString("NHTSACampaignNumber");
-                component = reader.getString("Component");
-                summary = reader.getString("Summary");
-                consequence = reader.getString("Conequence");
-                remedy = reader.getString("Remedy");
-                date = reader.getString("ReportReceivedDate");
-                recallInfo.add(new RecallAttribute(campaignNumber, component, summary, consequence, remedy, date));
-            }
+            campaignNumber = reader.getString("NHTSACampaignNumber");
+            component = reader.getString("Component");
+            summary = reader.getString("Summary");
+            consequence = reader.getString("Conequence");
+            remedy = reader.getString("Remedy");
+            date = reader.getString("ReportReceivedDate");
+            recallInfo.add(new RecallAttribute(campaignNumber, component, summary, consequence, remedy, date));
+
         }
 
         return recallInfo;
@@ -272,8 +272,14 @@ public class QueryUtils {
         String galleryUrls = element.first().getElementsByAttributeValue("name", "mmy-gallery-lightbox").attr("images");
 
         Elements msrp = doc.getElementsByAttributeValueContaining("itemprop","priceSpecification");
-        MSRP = "$"+msrp.attr("content");
-        if(MSRP.equals("$")){
+        String str = msrp.attr("content");
+        if(!str.equals("")) {
+            String[] strs = str.split("-");
+            DecimalFormat formatter = new DecimalFormat("#,###,###");
+            strs[0] = formatter.format(Integer.valueOf(strs[0]));
+            strs[1]= formatter.format(Integer.valueOf(strs[1]));
+            MSRP = "$"+strs[0]+" - $"+strs[1];
+        }else{
             MSRP = "N/A";
         }
 

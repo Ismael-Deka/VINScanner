@@ -12,6 +12,9 @@ import android.view.ViewGroup;
 import com.example.vinscanner.R;
 import com.example.vinscanner.adapter.CarInfoAdapter;
 import com.example.vinscanner.car.Car;
+import com.example.vinscanner.car.CarAttribute;
+
+import java.util.ArrayList;
 
 
 public class CarInfoFragment extends Fragment {
@@ -24,8 +27,12 @@ public class CarInfoFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_car_info, container, false);
 
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.info_list);
-        CarInfoAdapter infoAdapter = new CarInfoAdapter(mCar.getVin(),mCar.getMarketPrice(),mCar.getAttributes(),getContext());
-
+        CarInfoAdapter infoAdapter;
+        if(savedInstanceState == null) {
+            infoAdapter = new CarInfoAdapter(mCar.getVin(), mCar.getMarketPrice(), mCar.getAttributes(), getContext());
+        }else {
+            infoAdapter = readSavedInstance(savedInstanceState);
+        }
         recyclerView.setAdapter(infoAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -35,12 +42,33 @@ public class CarInfoFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
+        outState.putString("vin",mCar.getVin());
+        outState.putString("price",mCar.getMarketPrice());
 
+        ArrayList<CarAttribute> attributes = mCar.getAttributes();
+        for(int i = 0; i < attributes.size(); i++){
+            outState.putString("key"+i, attributes.get(i).getKey());
+            outState.putString("value"+i,attributes.get(i).getValue());
+            outState.putString("category"+i,attributes.get(i).getCategory());
+        }
+        outState.putInt("attrSize", attributes.size());
     }
 
     private void setCar(Car newCar) {
         mCar = newCar;
+    }
+
+    private CarInfoAdapter readSavedInstance(Bundle b){
+        String vin = b.getString("vin");
+        String price = b.getString("price");
+        int size = b.getInt("attrSize");
+        ArrayList<CarAttribute> attributes = new ArrayList<>();
+        for(int i = 0; i < size; i++){
+            attributes.add(new CarAttribute(b.getString("key"+i),b.getString("value"+i),b.getString("category"+i)));
+        }
+
+        return new CarInfoAdapter(vin, price, attributes, getContext());
+
     }
 
     public static CarInfoFragment createFragment(Car newCar){
@@ -48,4 +76,5 @@ public class CarInfoFragment extends Fragment {
         carInfoFragment.setCar(newCar);
         return carInfoFragment;
     }
+
 }

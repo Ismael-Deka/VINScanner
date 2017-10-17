@@ -131,9 +131,25 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
                         // The callback method gets the result of the request.
                     }
                 } else {
+                    if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
+                        Intent cameraIntent = new Intent(MainActivity.this,VinScannerActivity.class);
+                        startActivityForResult(cameraIntent, 1888);
+                    }else{
+                        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch (which){
+                                    case DialogInterface.BUTTON_POSITIVE:
+                                        break;
 
-                    Intent cameraIntent = new Intent(MainActivity.this,VinScannerActivity.class);
-                    startActivityForResult(cameraIntent, 1888);
+                                }
+                            }
+                        };
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                        builder.setMessage("Failed to connect Camera").setPositiveButton("Ok", dialogClickListener)
+                                .setTitle(getResources().getString(R.string.app_name)).show();
+                    }
+
                 }
 
             }
@@ -468,16 +484,18 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
     public boolean onQueryTextChange(String newText) {
         mAdapter.getFilter().filter(newText);
         mAdapter.notifyDataSetChanged();
+
         if (TextUtils.isEmpty(newText)) {
             mCarList.clearTextFilter();
             mAdapter.swapCursor(restoreCursor());
         }
         else {
-            mCarList.setFilterText(newText.toString());
-
+            mCarList.setFilterText(newText);
         }
         return true;
     }
+
+
     private Cursor getCursor(String str) {
 
         Cursor mCursor;

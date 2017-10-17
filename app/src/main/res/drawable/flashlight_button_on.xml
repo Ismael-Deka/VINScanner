@@ -7,7 +7,7 @@
         <corners android:radius="18dp" />
     </shape>
     </item>
-    <item android:drawable="@drawable/ic_lightbulb_outline_black_24dp"
+    <item android:drawable="@drawable/ic_iconmonstr_flashlight_1"
         android:top="16dp"
         android:bottom="16dp"
         android:left="16dp"

@@ -14,6 +14,7 @@ import com.example.vinscanner.R;
 import com.example.vinscanner.RecallAttribute;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 import static com.example.vinscanner.R.id.date;
@@ -30,6 +31,7 @@ public class CarRecallAdapter extends RecyclerView.Adapter<CarRecallAdapter.View
 
     public CarRecallAdapter(ArrayList<RecallAttribute> newRecallInfo, Context newContext){
         mRecallInfo = newRecallInfo;
+        Collections.reverse(mRecallInfo);
         mContext = newContext;
         for(int i = 0; i < mRecallInfo.size();i++){
             isViewExpaned.put(mRecallInfo.get(i).getCampaignNumber(),false);
@@ -91,8 +93,6 @@ public class CarRecallAdapter extends RecyclerView.Adapter<CarRecallAdapter.View
         final TextView remedy = holder.remedyTextView;
         CardView cardView = holder.recallCardView;
         final ImageView showMore = holder.showMoreImage;
-
-
 
 
         String infoComponent = info.getComponent();

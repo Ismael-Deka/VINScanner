@@ -12,6 +12,8 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.vinscanner.R;
 import com.example.vinscanner.VinScanner;
@@ -29,6 +31,7 @@ public class VinScannerActivity extends AppCompatActivity {
     private SurfaceHolder mHolder;
     private ImageButton mFlashlight;
     private VinScanner mScanner;
+    ImageView mBarcodeOutline;
     private boolean isFlashLightOn = false;
 
 
@@ -39,8 +42,10 @@ public class VinScannerActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         setContentView(R.layout.activity_vin_scanner);
 
-        mScanner = new VinScanner(this);
+        Toast.makeText(this,"Tap screen to focus.",Toast.LENGTH_LONG).show();
 
+        mScanner = new VinScanner(this);
+        mBarcodeOutline = (ImageView) findViewById(R.id.barcode_outline);
         mPreview = (SurfaceView) findViewById(R.id.camera_preview);
         mHolder = mPreview.getHolder();
         mHolder.addCallback(callBack);
@@ -162,7 +167,9 @@ public class VinScannerActivity extends AppCompatActivity {
                 break;
         }
         int result;
+        Log.e(TAG,info.orientation+"");
         result = (info.orientation-degrees+360)%360;
+        Log.e(TAG,result+"");
         mCamera.setDisplayOrientation(result);
 
 
@@ -182,6 +189,7 @@ public class VinScannerActivity extends AppCompatActivity {
         try {
             mCamera.setPreviewDisplay(mHolder);
         } catch (IOException e) {
+
             e.printStackTrace();
         }
         mCamera.setPreviewCallback(mScanner);
@@ -216,6 +224,10 @@ public class VinScannerActivity extends AppCompatActivity {
             e.printStackTrace();
             Log.i(TAG, "Unable to autofocus");
         }
+    }
+
+    public void setBarcodeOutlineFound(){
+        mBarcodeOutline.setImageResource(R.drawable.barcode_found_outline);
     }
 
     private Rect createFocusArea(float x, float y){

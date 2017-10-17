@@ -51,6 +51,7 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
     private AppBarLayout mAppBarLayout;
     private ProgressBar mProgressBar;
     private FloatingActionButton mFab;
+    private TextView mNoInternetView;
     private boolean mIsVehicleSaved;
 
     @Override
@@ -72,29 +73,40 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
         mTabs = (TabLayout) findViewById(R.id.sliding_tabs);
         mViewPager = (ViewPager) findViewById(R.id.viewpager);
 
-        TextView mNoInternetView = (TextView) findViewById(R.id.no_internet);
+        mNoInternetView = (TextView) findViewById(R.id.no_internet);
 
 
         mProgressBar.setVisibility(View.VISIBLE);
-        mNoInternetView.setVisibility(View.INVISIBLE);
         mFab.setVisibility(View.INVISIBLE);
         mTabs.setVisibility(View.INVISIBLE);
         mViewPager.setVisibility(View.INVISIBLE);
 
-        mVin = getIntent().getStringExtra("Vin");
-
+        if(savedInstanceState==null) {
+            mVin = getIntent().getStringExtra("Vin");
+        }else {
+            mVin = savedInstanceState.getString("vin");
+        }
         mIsVehicleSaved = isVehicleSaved();
 
 
 
 
         mAppBarLayout.setExpanded(false,false);
+
+
+    }
+
+    @Override
+    public void onStart(){
         if(isNetworkAvailable()) {
-            getSupportLoaderManager().initLoader(1, null, this).forceLoad();
+            if(mProgressBar.getVisibility() == View.VISIBLE) {
+                getSupportLoaderManager().initLoader(1, null, this).forceLoad();
+            }
         }else{
             mNoInternetView.setVisibility(View.VISIBLE);
             mProgressBar.setVisibility(View.INVISIBLE);
         }
+        super.onStart();
 
     }
 
@@ -182,9 +194,6 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
             return true;
         }
     }
-
-
-
 
     @Override
     public Loader<Car> onCreateLoader(int i, Bundle bundle) {

@@ -26,14 +26,6 @@
                     android:textSize="24sp"
                     android:padding="8dp"/>
                 <TextView
-                    android:id="@+id/first_attribute"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:paddingTop="8dp"
-                    android:paddingLeft="8dp"
-                    android:paddingRight="8dp"/>
-                <TextView
                     android:id="@+id/attributes"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

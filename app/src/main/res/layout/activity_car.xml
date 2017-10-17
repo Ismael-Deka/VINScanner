@@ -105,6 +105,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:text="@string/no_internet_connection"
+        android:visibility="gone"
         android:textSize="16sp"/>
     <ProgressBar
         android:id="@+id/progressBar"

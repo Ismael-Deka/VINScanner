@@ -4,11 +4,10 @@
     <item><shape
         android:shape="oval">
         <solid android:color="@color/flashlight_off" />
-
         <corners android:radius="18dp" />
-        </shape>
+    </shape>
     </item>
-    <item android:drawable="@drawable/ic_lightbulb_outline_white_24dp"
+    <item android:drawable="@drawable/ic_iconmonstr_flashlight_4"
         android:top="16dp"
         android:bottom="16dp"
         android:left="16dp"

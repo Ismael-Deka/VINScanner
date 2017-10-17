@@ -15,7 +15,7 @@ import com.example.vinscanner.ui.CarRecallFragment;
 public class CarInfoPagerAdapter extends FragmentPagerAdapter {
 
     private Car mCar;
-    private String tabTitles[] = new String[] { "General", "Recall"};
+    private String tabTitles[] = new String[] { "General", "Recalls"};
 
     public CarInfoPagerAdapter(FragmentManager manager){
         super(manager);

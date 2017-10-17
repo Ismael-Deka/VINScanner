@@ -86,6 +86,10 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
 
         mCarList.setAdapter(mAdapter);
 
+        LinearLayout emptyState = (LinearLayout) findViewById(R.id.empty_state);
+
+        mCarList.setEmptyView(emptyState);
+
         mSelectAllCheckBox= (CheckBox) findViewById(R.id.select_all_checkbox);
 
         mSelectAllCheckBox.setOnClickListener(new View.OnClickListener() {

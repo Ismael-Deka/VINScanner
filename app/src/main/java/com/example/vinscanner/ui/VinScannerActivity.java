@@ -1,5 +1,6 @@
 package com.example.vinscanner.ui;
 
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.hardware.Camera;
@@ -60,6 +61,9 @@ public class VinScannerActivity extends AppCompatActivity {
             }
         });
 
+        if(!getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)){
+            mFlashlight.setVisibility(View.GONE);
+        }
 
         mFlashlight.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,27 +102,25 @@ public class VinScannerActivity extends AppCompatActivity {
     }
 
     private void turnOnLight(ImageButton flashlight){
-
+        flashlight.setImageResource(R.drawable.flashlight_button_on);
         if(mCamera != null){
             Camera.Parameters params = mCamera.getParameters();
             params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
             mCamera.setParameters(params);
         }
 
-        flashlight.setImageResource(R.drawable.flashlight_button_on);
+
         isFlashLightOn = true;
 
     }
 
     private void turnOffLight(ImageButton flashlight){
-
+        flashlight.setImageResource(R.drawable.flashlight_button_off);
         if(mCamera != null){
             Camera.Parameters params = mCamera.getParameters();
             params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
             mCamera.setParameters(params);
         }
-
-        flashlight.setImageResource(R.drawable.flashlight_button_off);
         isFlashLightOn = false;
 
     }
@@ -192,6 +194,7 @@ public class VinScannerActivity extends AppCompatActivity {
 
             e.printStackTrace();
         }
+
         mCamera.setPreviewCallback(mScanner);
         mCamera.startPreview();
     }

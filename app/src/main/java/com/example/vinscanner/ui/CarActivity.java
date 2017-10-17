@@ -21,13 +21,14 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.vinscanner.adapter.CarImagePagerAdapter;
 import com.example.vinscanner.CarLoader;
 import com.example.vinscanner.R;
+import com.example.vinscanner.adapter.CarImagePagerAdapter;
 import com.example.vinscanner.adapter.CarInfoPagerAdapter;
 import com.example.vinscanner.car.Car;
 import com.example.vinscanner.db.CarContract;
@@ -52,6 +53,7 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
     private ProgressBar mProgressBar;
     private FloatingActionButton mFab;
     private TextView mNoInternetView;
+    private ImageView mImageNotFound;
     private boolean mIsVehicleSaved;
 
     @Override
@@ -72,6 +74,8 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
         mFab = (FloatingActionButton) findViewById(fab);
         mTabs = (TabLayout) findViewById(R.id.sliding_tabs);
         mViewPager = (ViewPager) findViewById(R.id.viewpager);
+        mImageNotFound = (ImageView)findViewById(R.id.image_not_found);
+
 
         mNoInternetView = (TextView) findViewById(R.id.no_internet);
 
@@ -219,6 +223,8 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
 
 
 
+
+
             CarInfoPagerAdapter carInfoPagerAdapter = new CarInfoPagerAdapter(getSupportFragmentManager());
             carInfoPagerAdapter.setCar(car);
             mViewPager.setAdapter(carInfoPagerAdapter);
@@ -231,13 +237,15 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
             if(car.getCarImages() != null) {
                 Bitmap[] galleryImages = car.getCarImages();
                 CarImagePagerAdapter carImageAdapter = new CarImagePagerAdapter(CarActivity.this,galleryImages);
-
+                mAppBarLayout.setExpanded(true,true);
                 mGallery.setAdapter(carImageAdapter);
                 if(galleryImages.length > 1)
                     mTabDots.setupWithViewPager(mGallery);
-                }
+                }else{
+                mImageNotFound.setVisibility(View.VISIBLE);
+            }
 
-                mAppBarLayout.setExpanded(true,true);
+
 
             mFab.setOnClickListener(new View.OnClickListener() {
                 @Override

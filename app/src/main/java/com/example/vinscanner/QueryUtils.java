@@ -39,7 +39,7 @@ public class QueryUtils {
     private static final String CARS_DOT_COM_URL_BASE = "https://www.cars.com/research/";
     private static final String NHTSA_VEHICLE_LOGO_BASE = "https://vpic.nhtsa.dot.gov/decoder/Images/Logos/";
     private static boolean isTrimIncluded = false;
-    private static String MSRP;
+    private static String MSRP = "N/A";
 
 
     public static Car extractCar(String vin) {
@@ -279,8 +279,6 @@ public class QueryUtils {
             strs[0] = formatter.format(Integer.valueOf(strs[0]));
             strs[1]= formatter.format(Integer.valueOf(strs[1]));
             MSRP = "$"+strs[0]+" - $"+strs[1];
-        }else{
-            MSRP = "N/A";
         }
 
 

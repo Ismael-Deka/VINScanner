@@ -27,8 +27,7 @@ public class CarImagePagerAdapter extends PagerAdapter {
     }
 
     @Override
-    public int getCount() {
-        return mImages.length;
+    public int getCount() {return mImages.length;
     }
 
     @Override

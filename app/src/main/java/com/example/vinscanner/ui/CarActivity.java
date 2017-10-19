@@ -38,6 +38,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import static com.example.vinscanner.R.id.fab;
+import static com.example.vinscanner.R.id.toolbar;
 
 public class CarActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Car>{
 
@@ -61,7 +62,7 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_car);
 
-        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar mToolbar = (Toolbar) findViewById(toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -94,8 +95,8 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
 
 
 
-
         mAppBarLayout.setExpanded(false,false);
+
 
 
     }
@@ -109,6 +110,7 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
         }else{
             mNoInternetView.setVisibility(View.VISIBLE);
             mProgressBar.setVisibility(View.INVISIBLE);
+
         }
         super.onStart();
 

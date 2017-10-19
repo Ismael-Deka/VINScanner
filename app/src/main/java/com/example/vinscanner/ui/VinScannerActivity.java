@@ -1,7 +1,6 @@
 package com.example.vinscanner.ui;
 
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.hardware.Camera;
 import android.os.Bundle;
@@ -95,11 +94,6 @@ public class VinScannerActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        doHandleRotation();
-        super.onConfigurationChanged(newConfig);
-    }
 
     private void turnOnLight(ImageButton flashlight){
         flashlight.setImageResource(R.drawable.flashlight_button_on);

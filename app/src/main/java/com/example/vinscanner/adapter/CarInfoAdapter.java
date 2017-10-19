@@ -119,7 +119,7 @@ public class CarInfoAdapter extends RecyclerView.Adapter<CarInfoAdapter.ViewHold
         if(mCategories.get(position).equals("General")){
             attributes.append(Html.fromHtml("<b>Vin</b>: " + mVin));
             attributes.append("\n" + "\n");
-            attributes.append(Html.fromHtml("<b>MSRP</b>: " + mMsrp));
+            attributes.append(Html.fromHtml("<b>List price</b>: " + mMsrp));
             attributes.append("\n" + "\n");
         }
 

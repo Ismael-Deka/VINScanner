@@ -9,6 +9,7 @@ import android.hardware.Camera;
 import android.os.Vibrator;
 import android.util.Log;
 import android.util.SparseArray;
+import android.widget.Toast;
 
 import com.example.vinscanner.ui.VinScannerActivity;
 import com.google.android.gms.common.api.CommonStatusCodes;
@@ -54,14 +55,17 @@ public class VinScanner implements Camera.PreviewCallback {
         if(barcodes.size() > 0) {
             Intent i = new Intent();
             Barcode barcode = barcodes.valueAt(0);
-            mParentActivity.setBarcodeOutlineFound();
-            i.putExtra("barcode", barcode);
-            if(!mIsVibrateOnce)
-                vibrate();
+            if(!barcode.displayValue.contains(" ")) {
+                i.putExtra("barcode", barcode);
+                mParentActivity.setBarcodeOutlineFound();
+                if (!mIsVibrateOnce)
+                    vibrate();
 
-            Log.e(TAG,"Barcode Found.");
-            mParentActivity.setResult(CommonStatusCodes.SUCCESS, i);
-            mParentActivity.finish();
+                Toast.makeText(mParentActivity,"VIN found.",Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Barcode Found.");
+                mParentActivity.setResult(CommonStatusCodes.SUCCESS, i);
+                mParentActivity.finish();
+            }
         }
     }
         private void vibrate(){

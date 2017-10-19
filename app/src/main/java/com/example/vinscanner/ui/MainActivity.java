@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
 
     private ListView mCarList;
     private CheckBox mSelectAllCheckBox;
+    private LinearLayout mEmptyState;
 
     private boolean mIsInDeleteVehicleState = false;
 
@@ -86,9 +87,8 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
 
         mCarList.setAdapter(mAdapter);
 
-        LinearLayout emptyState = (LinearLayout) findViewById(R.id.empty_state);
-
-        mCarList.setEmptyView(emptyState);
+        mEmptyState = (LinearLayout) findViewById(R.id.empty_state);
+        mCarList.setEmptyView(mEmptyState);
 
         mSelectAllCheckBox= (CheckBox) findViewById(R.id.select_all_checkbox);
 
@@ -307,6 +307,7 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
         mDeleteButton.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
+                int numSelected = getNumSelected(getSupportActionBar().getTitle().toString());
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -322,9 +323,11 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
                         }
                     }
                 };
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setMessage("Are you sure you want to delete "+getNumSelected(getSupportActionBar().getTitle().toString())+" vehicles?").setPositiveButton("Yes", dialogClickListener)
-                        .setNegativeButton("No", dialogClickListener).show();
+                if(numSelected>0) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setMessage("Are you sure you want to delete " + numSelected + " vehicles?").setPositiveButton("Yes", dialogClickListener)
+                            .setNegativeButton("No", dialogClickListener).show();
+                }
 
                 return true;
             }
@@ -475,7 +478,7 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
                 mSearchView.setQuery("",false);
             }
         }else if(query.length() == 17) {
-            mVin = query;
+            mVin = query.toUpperCase();
             startCarActivity(null);
         } else{
             Toast.makeText(this,"Vehicle not found.", Toast.LENGTH_SHORT).show();
@@ -492,9 +495,12 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
         if (TextUtils.isEmpty(newText)) {
             mCarList.clearTextFilter();
             mAdapter.swapCursor(restoreCursor());
+            mCarList.setEmptyView(mEmptyState);
         }
         else {
+            mCarList.setEmptyView(null);
             mCarList.setFilterText(newText);
+
         }
         return true;
     }

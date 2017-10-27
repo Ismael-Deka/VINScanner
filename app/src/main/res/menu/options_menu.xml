@@ -5,7 +5,7 @@
         android:title="Delete"
         android:icon="@drawable/ic_delete_white_24dp"
         android:visible="true"
-        app:showAsAction="collapseActionView|ifRoom"
+        app:showAsAction="ifRoom"
         />
     <item android:id="@+id/search"
         android:title="Search"

@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.example.vinscanner.car.Car;
 import com.example.vinscanner.car.CarAttribute;
+import com.example.vinscanner.car.RecallAttribute;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -295,9 +296,12 @@ public class QueryUtils {
             imageUrls.add(lastUrl.substring(0,lastUrl.length()-2));
 
         }
-
-        Bitmap[] carImages = new Bitmap[imageUrls.size()];
-
+        Bitmap[] carImages;
+        if(imageUrls.size()>8){
+            carImages = new Bitmap[8];
+        }else {
+            carImages = new Bitmap[imageUrls.size()];
+        }
         for(int i = 0; i < carImages.length; i++)
         try {
             InputStream inputStream = createUrl(imageUrls.get(i)).openStream();

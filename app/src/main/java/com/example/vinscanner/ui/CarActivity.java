@@ -21,9 +21,10 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.vinscanner.CarLoader;
@@ -53,8 +54,9 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
     private AppBarLayout mAppBarLayout;
     private ProgressBar mProgressBar;
     private FloatingActionButton mFab;
-    private TextView mNoInternetView;
+    private LinearLayout mNoInternetView;
     private ImageView mImageNotFound;
+    private ImageButton mReloadButton;
     private boolean mIsVehicleSaved;
 
     @Override
@@ -76,15 +78,34 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
         mTabs = (TabLayout) findViewById(R.id.sliding_tabs);
         mViewPager = (ViewPager) findViewById(R.id.viewpager);
         mImageNotFound = (ImageView)findViewById(R.id.image_not_found);
+        mReloadButton = (ImageButton) findViewById(R.id.reload_button);
 
 
-        mNoInternetView = (TextView) findViewById(R.id.no_internet);
+
+        mNoInternetView = (LinearLayout) findViewById(R.id.empty_state);
 
 
         mProgressBar.setVisibility(View.VISIBLE);
+        mNoInternetView.setVisibility(View.GONE);
         mFab.setVisibility(View.INVISIBLE);
         mTabs.setVisibility(View.INVISIBLE);
         mViewPager.setVisibility(View.INVISIBLE);
+
+        mReloadButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isNetworkAvailable()) {
+                    mProgressBar.setVisibility(View.VISIBLE);
+                    mNoInternetView.setVisibility(View.GONE);
+                    getSupportLoaderManager().initLoader(1, null, CarActivity.this).forceLoad();
+                }else{
+                    mNoInternetView.setVisibility(View.VISIBLE);
+                    mProgressBar.setVisibility(View.INVISIBLE);
+
+
+                }
+            }
+        });
 
         if(savedInstanceState==null) {
             mVin = getIntent().getStringExtra("Vin");
@@ -110,6 +131,7 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
         }else{
             mNoInternetView.setVisibility(View.VISIBLE);
             mProgressBar.setVisibility(View.INVISIBLE);
+
 
         }
         super.onStart();
@@ -170,8 +192,13 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
     private void deleteCar(Uri uri) {
 
         if (uri!= null) {
+            ContextWrapper cw = new ContextWrapper(getApplicationContext());
 
             int rowsDeleted = getContentResolver().delete(uri, null, null);
+
+            File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+            File mypath=new File(directory,mCar.getMake()+".jpg");
+            mypath.delete();
 
             if (rowsDeleted == 0) {
                 Toast.makeText(this, "Failed to Delete Vehicle",

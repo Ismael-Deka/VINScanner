@@ -2,8 +2,6 @@ package com.example.vinscanner.car;
 
 import android.graphics.Bitmap;
 
-import com.example.vinscanner.RecallAttribute;
-
 import java.util.ArrayList;
 
 /**

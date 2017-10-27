@@ -4,6 +4,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -60,7 +61,7 @@ public class VinScannerActivity extends AppCompatActivity {
             }
         });
 
-        if(!getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)){
+        if(!getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)||hasFlash()){
             mFlashlight.setVisibility(View.GONE);
         }
 
@@ -117,6 +118,26 @@ public class VinScannerActivity extends AppCompatActivity {
         }
         isFlashLightOn = false;
 
+    }
+
+    public boolean hasFlash() {
+        if (mCamera == null) {
+            return false;
+        }
+
+        Camera.Parameters parameters = mCamera.getParameters();
+
+        if (parameters.getFlashMode() == null) {
+            return false;
+        }
+
+        List<String> supportedFlashModes = parameters.getSupportedFlashModes();
+        if (supportedFlashModes == null || supportedFlashModes.isEmpty() || supportedFlashModes.size() == 1 &&
+                supportedFlashModes.get(0).equals(Camera.Parameters.FLASH_MODE_OFF)) {
+            return false;
+        }
+
+        return true;
     }
 
 
@@ -186,6 +207,12 @@ public class VinScannerActivity extends AppCompatActivity {
             mCamera.setPreviewDisplay(mHolder);
         } catch (IOException e) {
 
+            AlertDialog.Builder messageBox = new AlertDialog.Builder(this);
+            messageBox.setTitle(getResources().getString(R.string.app_name));
+            messageBox.setMessage(e.getMessage());
+            messageBox.setCancelable(false);
+            messageBox.setNeutralButton("OK", null);
+            messageBox.show();
             e.printStackTrace();
         }
 

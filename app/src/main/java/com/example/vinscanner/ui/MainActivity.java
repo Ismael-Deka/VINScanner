@@ -7,6 +7,7 @@ import android.app.SearchManager;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,6 +23,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
@@ -32,7 +34,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.CheckBox;
 import android.widget.FilterQueryProvider;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -44,6 +45,8 @@ import com.example.vinscanner.adapter.CarCursorAdapter;
 import com.example.vinscanner.db.CarContract;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.barcode.Barcode;
+
+import java.io.File;
 
 ;
 
@@ -60,17 +63,17 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
 
     private CarCursorAdapter mAdapter;
 
+
     private MenuItem mDeleteButton;
 
     private String mVin;
 
     private ListView mCarList;
-    private CheckBox mSelectAllCheckBox;
     private LinearLayout mEmptyState;
 
-    private boolean mIsInDeleteVehicleState = false;
+    private boolean mDeleteVehicleState = false;
 
-    LinearLayout mSelectAllLayout;
+
 
 
 
@@ -81,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
 
         FloatingActionButton scanButton = (FloatingActionButton) findViewById(R.id.scan_button);
         mCarList = (ListView) findViewById(R.id.car_list);
-        mSelectAllLayout = (LinearLayout) findViewById(R.id.select_all_layout);
+
 
         mAdapter = new CarCursorAdapter(this,null);
 
@@ -90,28 +93,7 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
         mEmptyState = (LinearLayout) findViewById(R.id.empty_state);
         mCarList.setEmptyView(mEmptyState);
 
-        mSelectAllCheckBox= (CheckBox) findViewById(R.id.select_all_checkbox);
 
-        mSelectAllCheckBox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                CheckBox checkBox;
-
-
-                    for(int i = 0; i < mCarList.getCount(); i++){
-                        View item = mCarList.getChildAt(i);
-                        checkBox =  (CheckBox) item.findViewById(R.id.car_list_checkbox);
-                        if(mSelectAllCheckBox.isChecked()) {
-                            MainActivity.this.getSupportActionBar().setTitle(mCarList.getCount()+ " selected");
-                            checkBox.setChecked(true);
-                        }else{
-                            MainActivity.this.getSupportActionBar().setTitle("0 selected");
-                            checkBox.setChecked(false);
-                        }
-                    }
-
-            }
-        });
 
 
 
@@ -181,96 +163,52 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
             }
         });
 
-
-
+        if(savedInstanceState != null){
+            mDeleteVehicleState = savedInstanceState.getBoolean("deleteState");
+        }
 
 
 }
-    private int getNumSelected(String str){
-        int num;
-        switch (str.length()-10){
-            case 1:
-                num= Integer.valueOf(str.substring(0,2));
-                break;
-            case 2:
-                num= Integer.valueOf(str.substring(0,3));
-                break;
-            case 3:
-                num= Integer.valueOf(str.substring(0,4));
-                break;
-            case 4:
-                num= Integer.valueOf(str.substring(0,4));
-                break;
-            default:
-                num = Integer.valueOf(str.substring(0,1));
-        }
-        return num;
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean("deleteState", mDeleteVehicleState);
+
     }
+
+
     private void setDeleteVehicleState(){
-        mDeleteButton.setVisible(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.GRAY));
-        MainActivity.this.getSupportActionBar().setTitle("0 Selected");
-        mSelectAllLayout.setVisibility(View.VISIBLE);
-        CheckBox checkBox;
-        for(int i = 0; i < mCarList.getCount(); i++){
-            View item = mCarList.getChildAt(i);
-            checkBox =  (CheckBox) item.findViewById(R.id.car_list_checkbox);
-            checkBox.setVisibility(View.VISIBLE);
-            checkBox.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    CheckBox c = (CheckBox) v;
-                    String str = MainActivity.this.getSupportActionBar().getTitle().toString();
-                    int num = getNumSelected(str);
-
-
-                    if(c.isChecked()){
-                        num++;
-                    }else{
-                        num--;
-                    }MainActivity.this.getSupportActionBar().setTitle(num+str.substring(str.length()-9));
-                    if(num==mCarList.getCount()){
-                        mSelectAllCheckBox.setChecked(true);
-                    }else {
-                        mSelectAllCheckBox.setChecked(false);
-                    }
-                }
-            });
-        }
-        mIsInDeleteVehicleState = true;
+        mDeleteButton.setVisible(false);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle("Delete Vehicles");
+        actionBar.setBackgroundDrawable(new ColorDrawable(Color.GRAY));
+        mAdapter.setDeleteState(true);
+        mDeleteVehicleState = true;
 
     }
     public void restoreNormalState(){
-        mDeleteButton.setVisible(false);
-        getSupportActionBar().setHomeButtonEnabled(false);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        MainActivity.this.getSupportActionBar().setTitle(getResources().getString(R.string.app_name));
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorPrimary)));
-        mSelectAllLayout.setVisibility(View.GONE);
-        mSelectAllCheckBox.setChecked(false);
-        CheckBox checkBox;
-        for(int i = 0; i < mCarList.getCount(); i++){
-            View item =  mCarList.getChildAt(i);
-            checkBox =  (CheckBox) item.findViewById(R.id.car_list_checkbox);
-            checkBox.setChecked(false);
-            checkBox.setVisibility(View.GONE);
-        }
-        mIsInDeleteVehicleState = false;
+        mDeleteVehicleState = false;
+        ActionBar actionBar = getSupportActionBar();
+        mDeleteButton.setVisible(true);
+        actionBar.setHomeButtonEnabled(false);
+        actionBar.setDisplayHomeAsUpEnabled(false);
+        actionBar.setTitle(getResources().getString(R.string.app_name));
+        actionBar.setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.colorPrimary)));
+        mAdapter.setDeleteState(false);
+
 
     }
-    public void deleteVehicles(){
-        CheckBox checkBox;
-        for(int i = 0; i < mCarList.getCount(); i++){
-            View item =  mCarList.getChildAt(i);
-            checkBox =  (CheckBox) item.findViewById(R.id.car_list_checkbox);
-            if(checkBox.isChecked()){
-                long id = mCarList.getItemIdAtPosition(i);
-                Uri uri = ContentUris.withAppendedId(CarContract.CarEntry.CONTENT_URI, id);
-                getContentResolver().delete(uri, null, null);
-            }
-        }
+
+
+
+    private void deleteCarLogo(String make) {
+        ContextWrapper cw = new ContextWrapper(getApplicationContext());
+
+        File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+        File mypath = new File(directory, make + ".jpg");
+        mypath.delete();
     }
 
     @Override
@@ -303,38 +241,20 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
                 getSystemService(Context.SEARCH_SERVICE);
         mSearchMenuItem = menu.findItem(R.id.search);
         mDeleteButton = menu.findItem(R.id.delete);
-        mDeleteButton.setVisible(false);
+
         mDeleteButton.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                int numSelected = getNumSelected(getSupportActionBar().getTitle().toString());
-                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which){
-                            case DialogInterface.BUTTON_POSITIVE:
-                                deleteVehicles();
-                                restoreNormalState();
-                                break;
 
-                            case DialogInterface.BUTTON_NEGATIVE:
-                                //No button clicked
-                                break;
-                        }
-                    }
-                };
-                if(numSelected>0) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                    builder.setMessage("Are you sure you want to delete " + numSelected + " vehicles?").setPositiveButton("Yes", dialogClickListener)
-                            .setNegativeButton("No", dialogClickListener).show();
-                }
-
+                setDeleteVehicleState();
                 return true;
             }
         });
+
         mSearchView = (SearchView) mSearchMenuItem.getActionView();
         mSearchView.setQueryHint("Enter Vehicle, or VIN...");
         mSearchView.setSubmitButtonEnabled(true);
+
 
 
         mAdapter.setFilterQueryProvider(new FilterQueryProvider() {
@@ -342,7 +262,7 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
             public Cursor runQuery(CharSequence constraint) {
                 Cursor cursor;
                 if(constraint != null && constraint.length()>0)
-                    cursor = getCursor(constraint.toString());
+                    cursor = getQueryCursor(constraint.toString());
                 else
                     cursor = restoreCursor();
 
@@ -362,6 +282,10 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
         mSearchView.setSubmitButtonEnabled(true);
         mSearchView.setOnQueryTextListener(this);
 
+        if(mDeleteVehicleState){
+            setDeleteVehicleState();
+        }
+
 
         return true;
     }
@@ -372,7 +296,7 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
 
         switch (item.getItemId()) {
             case android.R.id.home:
-                if(mIsInDeleteVehicleState)
+                if(mDeleteVehicleState)
                     restoreNormalState();
                 return true;
             default:
@@ -456,12 +380,6 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
         getLoaderManager().destroyLoader(0);
     }
 
-    @Override
-    protected void onDestroy() {
-        //mAdapter.getCursor().close();
-        super.onDestroy();
-
-    }
 
     @Override
     public boolean onQueryTextSubmit(String query) {
@@ -489,6 +407,9 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
 
     @Override
     public boolean onQueryTextChange(String newText) {
+        if(mDeleteVehicleState) {
+            restoreNormalState();
+        }
         mAdapter.getFilter().filter(newText);
         mAdapter.notifyDataSetChanged();
 
@@ -506,11 +427,13 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
     }
 
 
-    private Cursor getCursor(String str) {
+    private Cursor getQueryCursor(String str) {
 
-        Cursor mCursor;
+        Cursor cursor;
         if (str == null  ||  str.length () == 0)  {
-            mCursor = mAdapter.getCursor();
+
+            cursor = mAdapter.getCursor();
+
         }
         else {
             Uri uri =  CarContract.CarEntry.CONTENT_URI;
@@ -537,13 +460,13 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
                         CarContract.CarEntry.COLUMN_CAR_MODEL + " like '% " + query[2] + " %'";
 
             }
-            mCursor = getContentResolver().query(uri, projection, selection, null,
+            cursor = getContentResolver().query(uri, projection, selection, null,
                     null);
         }
-        if (mCursor != null) {
-            mCursor.moveToFirst();
+        if (cursor != null) {
+            cursor.moveToFirst();
         }
-        return mCursor;
+        return cursor;
     }
     private Cursor getVinCursor(String str) {
         Cursor mCursor;

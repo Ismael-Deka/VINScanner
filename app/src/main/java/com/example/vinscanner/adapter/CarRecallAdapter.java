@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.vinscanner.R;
-import com.example.vinscanner.RecallAttribute;
+import com.example.vinscanner.car.RecallAttribute;
 
 import java.util.ArrayList;
 import java.util.Collections;

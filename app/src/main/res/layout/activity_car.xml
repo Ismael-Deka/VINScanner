@@ -106,14 +106,41 @@
         android:layout_alignParentRight="true"
         android:layout_margin="16dp"
     />
-    <TextView
-        android:id="@+id/no_internet"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/empty_state"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="@string/no_internet_connection"
-        android:visibility="gone"
-        android:textSize="16sp"/>
+        android:orientation="vertical">
+        <ImageView
+            android:src="@drawable/ic_wifi_black_24px"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/no_internet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:layout_centerInParent="true"
+            android:text="No Internet Connection"
+            android:textSize="24sp"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageButton
+                android:id="@+id/reload_button"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_refresh_black_24px"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                />
+
+        </RelativeLayout>
+
+
+
+    </LinearLayout>
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"

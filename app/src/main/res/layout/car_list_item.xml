@@ -1,20 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Layout for a single list item in the list of pets -->
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
     android:padding="16dp">
-    <CheckBox
-        android:id="@+id/car_list_checkbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:padding="9dp"
-    />
+
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/list_logo"
+        android:layout_toEndOf="@+id/car_list_delete_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
@@ -23,9 +17,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="9dp">
+        android:padding="9dp"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/list_logo"
+        android:id="@+id/linearLayout">
+
         <TextView
             android:id="@+id/car_name"
+            android:text="Name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-medium"
@@ -34,12 +33,24 @@
 
         <TextView
             android:id="@+id/car_vin"
+            android:text="Vin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
             android:textAppearance="?android:textAppearanceSmall"
             android:textColor="#AEB6BD"  />
     </LinearLayout>
+    <ImageButton
+        android:id="@+id/car_list_delete_button"
+        android:src="@drawable/ic_delete_black_24px"
+        android:background="@android:color/holo_red_dark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:padding="6dp"
+         />
 
 
-</LinearLayout>
+</RelativeLayout>

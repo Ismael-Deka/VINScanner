@@ -1,4 +1,4 @@
-package com.example.vinscanner;
+package com.example.vinscanner.car;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

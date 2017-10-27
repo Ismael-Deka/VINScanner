@@ -23,6 +23,7 @@ import com.example.vinscanner.VinScanner;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.barcode.Barcode;
 
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,21 +40,20 @@ public class VinScannerActivity extends AppCompatActivity implements VinScanner.
     private ImageButton mFlashlight;
     private VinScanner mScanner;
     ImageView mBarcodeOutline;
+    OrientationEventListener mOrientationEventListener;
     private boolean isFlashLightOn = false;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        OrientationEventListener mOrientationEventListener = new OrientationEventListener(this,SENSOR_DELAY_NORMAL) {
+        mOrientationEventListener= new OrientationEventListener(this,SENSOR_DELAY_NORMAL) {
 
             @Override
             public void onOrientationChanged(int orientation) {
                 doHandleRotation();
             }
         };
-
-        mOrientationEventListener.enable();
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
         getSupportActionBar().hide();
         setContentView(R.layout.activity_vin_scanner);
@@ -168,6 +168,9 @@ public class VinScannerActivity extends AppCompatActivity implements VinScanner.
         public void surfaceCreated(SurfaceHolder surfaceHolder) {
 
             startCamera();
+            if(mOrientationEventListener.canDetectOrientation()) {
+                mOrientationEventListener.enable();
+            }
         }
 
         @Override
@@ -178,6 +181,7 @@ public class VinScannerActivity extends AppCompatActivity implements VinScanner.
         @Override
         public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
             Log.e(TAG,"Releasing camera");
+            mOrientationEventListener.disable();
             mCamera.setPreviewCallback(null);
             mCamera.stopPreview();
             mCamera.release();
@@ -185,31 +189,33 @@ public class VinScannerActivity extends AppCompatActivity implements VinScanner.
         }
     };
 
+
     private void doHandleRotation(){
         if (mCamera != null) {
-            Camera.CameraInfo info = new Camera.CameraInfo();
-            Camera.getCameraInfo(Camera.CameraInfo.CAMERA_FACING_BACK, info);
-            int rotation = this.getWindowManager().getDefaultDisplay().getRotation();
-            int degrees = 0;
-            switch (rotation) {
-                case Surface.ROTATION_0:
-                    degrees = 0;
-                    break;
-                case Surface.ROTATION_90:
-                    degrees = 90;
-                    break;
-                case Surface.ROTATION_180:
-                    degrees = 180;
-                    break;
-                case Surface.ROTATION_270:
-                    degrees = 270;
-                    break;
-            }
-            int result;
-            Log.e(TAG, info.orientation + "");
-            result = (info.orientation - degrees + 360) % 360;
-            Log.e(TAG, result + "");
-            mCamera.setDisplayOrientation(result);
+                Camera.CameraInfo info = new Camera.CameraInfo();
+                Camera.getCameraInfo(Camera.CameraInfo.CAMERA_FACING_BACK, info);
+                int rotation = this.getWindowManager().getDefaultDisplay().getRotation();
+                int degrees = 0;
+                switch (rotation) {
+                    case Surface.ROTATION_0:
+                        degrees = 0;
+                        break;
+                    case Surface.ROTATION_90:
+                        degrees = 90;
+                        break;
+                    case Surface.ROTATION_180:
+                        degrees = 180;
+                        break;
+                    case Surface.ROTATION_270:
+                        degrees = 270;
+                        break;
+                }
+                int result;
+                Log.e(TAG, info.orientation + "");
+                result = (info.orientation - degrees + 360) % 360;
+                Log.e(TAG, result + "");
+                mCamera.setDisplayOrientation(result);
+
         }
 
     }

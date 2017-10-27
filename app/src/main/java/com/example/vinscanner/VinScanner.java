@@ -1,5 +1,6 @@
 package com.example.vinscanner;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
@@ -11,8 +12,6 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.widget.Toast;
 
-import com.example.vinscanner.ui.VinScannerActivity;
-import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
@@ -28,11 +27,18 @@ import static com.google.android.gms.wearable.DataMap.TAG;
 
 @SuppressWarnings("deprecation")
 public class VinScanner implements Camera.PreviewCallback {
-    private VinScannerActivity mParentActivity;
+    private Context mContext;
     private boolean mIsVibrateOnce = false;
+    private OnVinFoundListener mCallback;
 
-    public VinScanner(VinScannerActivity newParentActivity){
-        mParentActivity = newParentActivity;
+    public interface OnVinFoundListener{
+        void onVinFound(Barcode barcode);
+    }
+
+
+
+    public VinScanner(Context context){
+        mContext = context;
     }
     @Override
     public void onPreviewFrame(byte[] bytes, Camera camera) {
@@ -50,27 +56,25 @@ public class VinScanner implements Camera.PreviewCallback {
 
     }
     private void detectBarcode(Frame frame){
-        BarcodeDetector detector = new BarcodeDetector.Builder(mParentActivity).setBarcodeFormats(Barcode.CODE_39).build();
+        BarcodeDetector detector = new BarcodeDetector.Builder(mContext).setBarcodeFormats(Barcode.CODE_39).build();
         SparseArray<Barcode> barcodes = detector.detect(frame);
         if(barcodes.size() > 0) {
             Intent i = new Intent();
             Barcode barcode = barcodes.valueAt(0);
             if(!barcode.displayValue.contains(" ")) {
-                Toast.makeText(mParentActivity,"VIN: "+barcode.displayValue.substring(1),Toast.LENGTH_SHORT).show();
-                i.putExtra("barcode", barcode);
-                mParentActivity.setBarcodeOutlineFound();
+                Toast.makeText(mContext,"VIN: "+barcode.displayValue.substring(1),Toast.LENGTH_SHORT).show();
                 if (!mIsVibrateOnce)
                     vibrate();
-
-
                 Log.e(TAG, "Barcode Found.");
-                mParentActivity.setResult(CommonStatusCodes.SUCCESS, i);
-                mParentActivity.finish();
+                mCallback.onVinFound(barcode);
             }
         }
     }
-        private void vibrate(){
-            Vibrator vibrator = (Vibrator)mParentActivity.getSystemService(VIBRATOR_SERVICE);
+    public void setOnVinFoundListener(OnVinFoundListener vinFoundListener){
+        mCallback = vinFoundListener;
+    }
+    private void vibrate(){
+            Vibrator vibrator = (Vibrator) mContext.getSystemService(VIBRATOR_SERVICE);
             if(vibrator.hasVibrator()) {
                 vibrator.vibrate(500);
                 mIsVibrateOnce = true;

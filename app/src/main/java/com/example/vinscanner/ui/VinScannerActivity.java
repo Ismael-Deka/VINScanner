@@ -1,5 +1,6 @@
 package com.example.vinscanner.ui;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.hardware.Camera;
@@ -18,13 +19,15 @@ import android.widget.Toast;
 
 import com.example.vinscanner.R;
 import com.example.vinscanner.VinScanner;
+import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.vision.barcode.Barcode;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("deprecation")
-public class VinScannerActivity extends AppCompatActivity {
+public class VinScannerActivity extends AppCompatActivity implements VinScanner.OnVinFoundListener {
 
     public final String TAG = "VinScannerActivity";
     private SurfaceView mPreview;
@@ -46,6 +49,7 @@ public class VinScannerActivity extends AppCompatActivity {
         Toast.makeText(this,"Tap screen to focus.",Toast.LENGTH_LONG).show();
 
         mScanner = new VinScanner(this);
+        mScanner.setOnVinFoundListener(this);
         mBarcodeOutline = (ImageView) findViewById(R.id.barcode_outline);
         mPreview = (SurfaceView) findViewById(R.id.camera_preview);
         mHolder = mPreview.getHolder();
@@ -273,5 +277,12 @@ public class VinScannerActivity extends AppCompatActivity {
     }
 
 
-
+    @Override
+    public void onVinFound(Barcode barcode) {
+        setBarcodeOutlineFound();
+        Intent i = new Intent();
+        i.putExtra("barcode", barcode);
+        setResult(CommonStatusCodes.SUCCESS, i);
+        finish();
+    }
 }

@@ -116,10 +116,26 @@ public class CarCursorAdapter extends CursorAdapter {
            public void onClick(DialogInterface dialog, int which) {
                switch (which) {
                    case DialogInterface.BUTTON_POSITIVE:
-                       Uri uri = ContentUris.withAppendedId(CarContract.CarEntry.CONTENT_URI, id);
-                       listItem.setAnimation(outToRightAnimation());
-                       listItem.getAnimation().start();
-                       mContext.getContentResolver().delete(uri, null, null);
+                       final Uri uri = ContentUris.withAppendedId(CarContract.CarEntry.CONTENT_URI, id);
+                       listItem.startAnimation(outToRightAnimation());
+                       listItem.getAnimation().setAnimationListener(new Animation.AnimationListener() {
+                           @Override
+                           public void onAnimationStart(Animation animation) {
+
+                           }
+
+                           @Override
+                           public void onAnimationEnd(Animation animation) {
+                               listItem.setVisibility(View.GONE);
+                               mContext.getContentResolver().delete(uri, null, null);
+                           }
+
+                           @Override
+                           public void onAnimationRepeat(Animation animation) {
+
+                           }
+                       });
+
                        break;
 
                    case DialogInterface.BUTTON_NEGATIVE:

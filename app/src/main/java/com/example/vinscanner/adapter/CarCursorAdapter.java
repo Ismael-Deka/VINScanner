@@ -128,6 +128,8 @@ public class CarCursorAdapter extends CursorAdapter {
                            public void onAnimationEnd(Animation animation) {
                                listItem.setVisibility(View.GONE);
                                mContext.getContentResolver().delete(uri, null, null);
+                               listItem.setVisibility(View.VISIBLE);
+
                            }
 
                            @Override

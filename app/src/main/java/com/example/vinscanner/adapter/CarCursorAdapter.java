@@ -186,7 +186,7 @@ public class CarCursorAdapter extends CursorAdapter {
                 Animation.RELATIVE_TO_PARENT, 0.0f,
                 Animation.RELATIVE_TO_PARENT, 0.0f,
                 Animation.RELATIVE_TO_PARENT, 0.0f);
-        inFromLeft.setDuration(500);
+        inFromLeft.setDuration(200);
         inFromLeft.setInterpolator(new AccelerateInterpolator());
         return inFromLeft;
     }
@@ -196,7 +196,7 @@ public class CarCursorAdapter extends CursorAdapter {
                 Animation.RELATIVE_TO_PARENT, -1.0f,
                 Animation.RELATIVE_TO_PARENT, 0.0f,
                 Animation.RELATIVE_TO_PARENT, 0.0f);
-        outtoLeft.setDuration(500);
+        outtoLeft.setDuration(200);
         outtoLeft.setInterpolator(new AccelerateInterpolator());
         return outtoLeft;
     }

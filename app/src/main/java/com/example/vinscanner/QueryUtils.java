@@ -275,17 +275,25 @@ public class QueryUtils {
         Log.e(LOG_TAG,msrp.get(0).toString().split(": ")[1].replace("</li>",""));
         MSRP = msrp.get(0).toString().split(": ")[1].replace("</li>","");
 
+
         if(galleryUrls.isEmpty()){
             element= doc.getElementsByAttributeValueContaining("class", "slide nonDraggableImage");
             imageUrls.add(element.first().attr("src"));
         }else {
             String[] urls = galleryUrls.split("\"[&quot|&quot;,&quot;|&quot;]\"");
-            imageUrls.add(urls[0].substring(2));
-            for(int i =1; i < urls.length-1; i++) {
-                imageUrls.add(urls[i]);
+            //Differentiate methods of extracting URLs for one of more images
+            if(urls.length>1) {
+                imageUrls.add(urls[0].substring(2));
+                Log.e(LOG_TAG, urls[0]);
+                for (int i = 1; i < urls.length - 1; i++) {
+                    imageUrls.add(urls[i]);
+                }
+                String lastUrl = urls[urls.length - 1];
+                imageUrls.add(lastUrl.substring(0, lastUrl.length() - 2));
+            }else {
+                galleryUrls = galleryUrls.replace("[\"","").replace("\"]","");
+                imageUrls.add(galleryUrls);
             }
-            String lastUrl = urls[urls.length-1];
-            imageUrls.add(lastUrl.substring(0,lastUrl.length()-2));
 
         }
         Bitmap[] carImages;

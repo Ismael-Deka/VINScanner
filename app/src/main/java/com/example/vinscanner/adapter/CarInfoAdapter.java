@@ -112,7 +112,7 @@ public class CarInfoAdapter extends RecyclerView.Adapter<CarInfoAdapter.ViewHold
         CardView cardView = holder.infoCardView;
         final ImageView showMore = holder.showMoreImage;
 
-
+        //Set Category color to light blue.
         category.setText(mCategories.get(position));
         category.setTextColor(Color.parseColor("#42A5F5"));
         attributes.setText("");

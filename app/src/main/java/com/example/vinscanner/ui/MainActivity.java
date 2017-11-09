@@ -253,7 +253,7 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
 
         mSearchView = (SearchView) mSearchMenuItem.getActionView();
         mSearchView.setQueryHint("Enter Vehicle, or VIN...");
-        mSearchView.setSubmitButtonEnabled(true);
+        mSearchView.setSubmitButtonEnabled(false);
 
 
 
@@ -279,7 +279,6 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
 
         mSearchView.setSearchableInfo(searchManager.
                 getSearchableInfo(getComponentName()));
-        mSearchView.setSubmitButtonEnabled(true);
         mSearchView.setOnQueryTextListener(this);
 
         if(mDeleteVehicleState){

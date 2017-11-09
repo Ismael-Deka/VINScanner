@@ -23,7 +23,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import static com.example.vinscanner.ui.MainActivity.LOG_TAG;
@@ -269,19 +268,12 @@ public class QueryUtils {
         Elements element;
         ArrayList<String> imageUrls = new ArrayList<>();
 
-        element= doc.getElementsByAttributeValueContaining("ng-controller","pageStateController as psCtrl");
-        String galleryUrls = element.first().getElementsByAttributeValue("name", "mmy-gallery-lightbox").attr("images");
+        element= doc.getElementsByTag("cui-lightbox");
+        String galleryUrls = element.attr("images");
 
-        Elements msrp = doc.getElementsByAttributeValueContaining("itemprop","priceSpecification");
-        String str = msrp.attr("content");
-        if(!str.equals("")) {
-            String[] strs = str.split("-");
-            DecimalFormat formatter = new DecimalFormat("#,###,###");
-            strs[0] = formatter.format(Integer.valueOf(strs[0]));
-            strs[1]= formatter.format(Integer.valueOf(strs[1]));
-            MSRP = "$"+strs[0]+" - $"+strs[1];
-        }
-
+        Elements msrp = doc.getElementsByClass("mmy-spec");
+        Log.e(LOG_TAG,msrp.get(0).toString().split(": ")[1].replace("</li>",""));
+        MSRP = msrp.get(0).toString().split(": ")[1].replace("</li>","");
 
         if(galleryUrls.isEmpty()){
             element= doc.getElementsByAttributeValueContaining("class", "slide nonDraggableImage");

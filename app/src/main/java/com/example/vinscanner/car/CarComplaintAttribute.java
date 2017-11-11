@@ -7,8 +7,8 @@ package com.example.vinscanner.car;
 public class CarComplaintAttribute {
 
     private String mODINumber;
-    private boolean mCrash;
-    private boolean mFire;
+    private String mCrash;
+    private String mFire;
     private int mNumberInjured;
     private int mNumberDeaths;
     private String mDateIncident;
@@ -16,7 +16,7 @@ public class CarComplaintAttribute {
     private String mComponent;
     private String mSummary;
 
-    public CarComplaintAttribute(String odiNumber, boolean crash, boolean fire, int numberInjured,
+    public CarComplaintAttribute(String odiNumber, String crash, String fire, int numberInjured,
                                  int numberDeaths, String dateIncident, String dateFiled, String component, String summary){
         mODINumber = odiNumber;
         mCrash = crash;
@@ -30,11 +30,11 @@ public class CarComplaintAttribute {
 
     }
 
-    public boolean isCrash() {
+    public String getCrash() {
         return mCrash;
     }
 
-    public boolean isFire() {
+    public String getFire() {
         return mFire;
     }
 
@@ -70,7 +70,7 @@ public class CarComplaintAttribute {
         this.mComponent = mComponent;
     }
 
-    public void setCrash(boolean mCrash) {
+    public void setCrash(String mCrash) {
         this.mCrash = mCrash;
     }
 
@@ -82,7 +82,7 @@ public class CarComplaintAttribute {
         this.mDateIncident = mDateIncident;
     }
 
-    public void setFire(boolean mFire) {
+    public void setFire(String mFire) {
         this.mFire = mFire;
     }
 

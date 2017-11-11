@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp">
+    <android.support.v7.widget.CardView
+        android:id="@+id/complaint_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardElevation="6dp"
+        app:cardUseCompatPadding="true">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="20dp">
+                <TextView
+                    android:id="@+id/component"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Component"
+                    android:textSize="20sp"
+                    android:padding="8dp"/>
+                <TextView
+                    android:id="@+id/date_incident"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Date of Incident"
+                    android:fontFamily=""
+                    android:textSize="16sp"
+                    android:padding="8dp"/>
+                <TextView
+                    android:id="@+id/odi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ODINumber"
+                    android:fontFamily=""
+                    android:textSize="16sp"
+                    android:padding="8dp"/>
+                <TextView
+                    android:id="@+id/crash"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Crash"
+                    android:fontFamily=""
+                    android:textSize="16sp"
+                    android:padding="8dp"/>
+                <TextView
+                    android:id="@+id/fire"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Fire"
+                    android:fontFamily=""
+                    android:textSize="16sp"
+                    android:padding="8dp"/>
+                <TextView
+                    android:id="@+id/num_injured"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Number Injured"
+                    android:fontFamily=""
+                    android:textSize="16sp"
+                    android:padding="8dp"/>
+                <TextView
+                    android:id="@+id/num_death"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Number Dead"
+                    android:fontFamily=""
+                    android:textSize="16sp"
+                    android:padding="8dp"/>
+                <TextView
+                    android:id="@+id/summary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Summary"
+                    android:fontFamily=""
+                    android:textSize="16sp"
+                    android:padding="8dp"/>
+
+
+
+            </LinearLayout>
+            <ImageView
+                android:id="@+id/show_more"
+                android:src="@drawable/ic_keyboard_arrow_down_black_24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"/>
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Date"
+                android:layout_alignParentRight="true"
+                android:padding="8dp"/>
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

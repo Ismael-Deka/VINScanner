@@ -145,8 +145,8 @@ public class QueryUtils {
         JSONArray arr = reader.getJSONArray("Results");
 
         String odiNumber;
-        boolean crash = false;
-        boolean fire = false;
+        String crash;
+        String fire;
         int numberInjured;
         int numberDeaths;
         String dateIncident = null;
@@ -154,6 +154,7 @@ public class QueryUtils {
         String component;
         String summary;
         for(int i = 0; i < arr.length();i++){
+            Log.e("Complaint",i+"");
             reader = arr.getJSONObject(i);
             odiNumber = reader.getString("ODINumber");
             component = reader.getString("Component");
@@ -164,12 +165,8 @@ public class QueryUtils {
                 dateIncident = reader.getString("DateofIncident");
             }
             dateFiled = reader.getString("DateComplaintFiled");
-            if(reader.getString("Crash") == "Yes"){
-                crash = true;
-            }
-            if(reader.getString("Fire") == "Yes"){
-                fire = true;
-            }
+            crash =reader.getString("Crash");
+            fire = reader.getString("Fire");
             complaints.add(new CarComplaintAttribute(odiNumber,crash,fire,numberInjured,numberDeaths,
                                                     dateIncident,dateFiled,component,summary));
 

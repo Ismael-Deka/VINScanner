@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.example.vinscanner.car.Car;
+import com.example.vinscanner.ui.CarComplaintFragment;
 import com.example.vinscanner.ui.CarInfoFragment;
 import com.example.vinscanner.ui.CarRecallFragment;
 
@@ -15,7 +16,7 @@ import com.example.vinscanner.ui.CarRecallFragment;
 public class CarInfoPagerAdapter extends FragmentPagerAdapter {
 
     private Car mCar;
-    private String tabTitles[] = new String[] { "General", "Recalls"};
+    private String tabTitles[] = new String[] { "General", "Recalls", "Complaints"};
 
     public CarInfoPagerAdapter(FragmentManager manager){
         super(manager);
@@ -31,15 +32,17 @@ public class CarInfoPagerAdapter extends FragmentPagerAdapter {
         switch (position) {
             case 0:
                 return CarInfoFragment.createFragment(mCar);
-            default:
+            case 1:
                 return CarRecallFragment.createFragment(mCar);
+            default:
+                return CarComplaintFragment.createFragment(mCar);
 
         }
     }
 
     @Override
     public int getCount() {
-        return 2;
+        return 3;
     }
 
     @Override

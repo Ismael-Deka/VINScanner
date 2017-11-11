@@ -72,6 +72,7 @@ public class CarRecallFragment extends Fragment {
 
         ArrayList<RecallAttribute> attributes = mCar.getRecallInfo();
         for(int i = 0; i < attributes.size(); i++){
+
             outState.putString("campaign"+i, attributes.get(i).getCampaignNumber());
             outState.putString("component"+i,attributes.get(i).getComponent());
             outState.putString("consequence"+i,attributes.get(i).getConsequence());

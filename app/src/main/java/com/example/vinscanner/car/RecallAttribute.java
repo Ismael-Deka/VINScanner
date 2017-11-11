@@ -24,14 +24,18 @@ public class RecallAttribute {
         mDate = formatDate(date);
     }
 
-    private String formatDate(String rawDate){
-        String[] strs = rawDate.split("[(]");
-        String str = strs[1];
-        String unixDate = str.substring(0,str.length()-7);
-        long temp = Long.parseLong(unixDate);
-        SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM d, yyyy");
-        unixDate = sdf.format(new Date(temp));
-        return unixDate;
+    public static String formatDate(String rawDate){
+        if(rawDate != null) {
+            String[] strs = rawDate.split("[(]");
+            String str = strs[1];
+            String unixDate = str.substring(0, str.length() - 7);
+            long temp = Long.parseLong(unixDate);
+            SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM d, yyyy");
+            unixDate = sdf.format(new Date(temp));
+            return unixDate;
+        }else {
+            return null;
+        }
 
     }
 

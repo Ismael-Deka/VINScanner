@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class Car {
 
     private int mErrorCode;
-    private final String mVin;
+    private String mVin;
     private String mMake;
     private String mModel;
     private String mYear;
@@ -21,10 +21,29 @@ public class Car {
     private Bitmap mCarImage[];
     private ArrayList<CarAttribute> mInfo;
     private ArrayList<RecallAttribute> mRecallInfo;
+    private ArrayList<CarComplaintAttribute> mComplaints;
+
+
+    public Car(){
+
+    }
+
+    public Car (int newErrorCode, String newMake,String newModel, String newTrim, String newYear,ArrayList<CarAttribute> newAttributes){
+        mErrorCode = newErrorCode;
+        if(newMake != null) {
+            mMake = newMake.substring(0, 1) + newMake.substring(1).toLowerCase();
+        }
+        mModel = newModel;
+        mTrim = newTrim;
+        mYear = newYear;
+        mInfo = newAttributes;
+
+    }
 
 
     public Car(int newErrorCode, String newMake,String newModel, String newTrim, String newYear, String newVin,Bitmap[] newImage,
-               ArrayList<CarAttribute> newAttributes,ArrayList<RecallAttribute> newRecallAttribute, Bitmap newLogo,String newMarketPrice){
+               ArrayList<CarAttribute> newAttributes,ArrayList<RecallAttribute> newRecallAttribute,
+               ArrayList<CarComplaintAttribute> newComplaints, Bitmap newLogo,String newMarketPrice){
 
         mErrorCode = newErrorCode;
         if(newMake != null) {
@@ -39,6 +58,7 @@ public class Car {
         mCarImage = newImage;
         mRecallInfo = newRecallAttribute;
         mMarketPrice = newMarketPrice;
+        mComplaints = newComplaints;
 
 
     }
@@ -89,5 +109,9 @@ public class Car {
 
     public Bitmap getLogo() {
         return mLogo;
+    }
+
+    public ArrayList<CarComplaintAttribute> getComplaints() {
+        return mComplaints;
     }
 }

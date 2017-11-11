@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.example.vinscanner.car.Car;
 import com.example.vinscanner.car.CarAttribute;
+import com.example.vinscanner.car.CarComplaintAttribute;
 import com.example.vinscanner.car.RecallAttribute;
 
 import org.json.JSONArray;
@@ -36,14 +37,15 @@ public class QueryUtils {
 
     private static final String NHTSA_VIN_DECODE_URL_BASE = "https://vpic.nhtsa.dot.gov/api/vehicles/decodevinextended/";
     private static final String NHTSA_RECALL_URL_BASE = "https://one.nhtsa.gov/webapi/api/Recalls/vehicle/modelyear/";
+    private static final String NHASA_COMPLAINTS_URL_BASE = "https://one.nhtsa.gov/webapi/api/Complaints/vehicle/modelyear/";
     private static final String CARS_DOT_COM_URL_BASE = "https://www.cars.com/research/";
     private static final String NHTSA_VEHICLE_LOGO_BASE = "https://vpic.nhtsa.dot.gov/decoder/Images/Logos/";
     private static boolean isTrimIncluded = false;
-    private static String MSRP = "N/A";
+    private static String MSRP = "Unavailable";
 
 
     public static Car extractCar(String vin) {
-        Car decodedCar = new Car(-1,null,null,null,null,null,null,null,null,null,null);
+        Car decodedCar = new Car();
         Bitmap[] carImages;
 
 
@@ -57,11 +59,14 @@ public class QueryUtils {
 
             Car car = getCarInfo(jsonResponse);
             String recallUrl;
+            String complaintUrl;
             if(car.getModel().contains(" ")) {
                 String model = car.getModel().replace(" ", "");
                 recallUrl = NHTSA_RECALL_URL_BASE + car.getYear() + "/make/" + car.getMake() + "/model/"+model+"?format=json";
+                complaintUrl = NHASA_COMPLAINTS_URL_BASE + car.getYear() + "/make/" + car.getMake() + "/model/"+model+"?format=json";
             }else {
                 recallUrl = NHTSA_RECALL_URL_BASE + car.getYear() + "/make/" + car.getMake() + "/model/"+car.getModel()+"?format=json";
+                complaintUrl = NHASA_COMPLAINTS_URL_BASE + car.getYear() + "/make/" + car.getMake() + "/model/"+car.getModel()+"?format=json";
             }
 
             Log.e(LOG_TAG,recallUrl);
@@ -69,12 +74,18 @@ public class QueryUtils {
 
             ArrayList<RecallAttribute> recallInfo = getRecallInfo(jsonResponse);
 
+            jsonResponse = makeHttpRequest(createUrl(complaintUrl));
+
+            ArrayList<CarComplaintAttribute> complaints = getComplaints(jsonResponse);
+
             carImages = getCarImage(car.getMake(),car.getModel(),car.getYear(),car.getTrim(),car.getErrorCode());
 
             if(isTrimIncluded && !car.getTrim().equals("null"))
-                decodedCar = new Car(car.getErrorCode(),car.getMake(),car.getModel()+" "+car.getTrim(),car.getTrim(),car.getYear(),vin,carImages,car.getAttributes(),recallInfo,getCarLogo(car.getMake()),MSRP);
+                decodedCar = new Car(car.getErrorCode(),car.getMake(),car.getModel()+" "+car.getTrim(),car.getTrim(),car.getYear(),vin,
+                        carImages,car.getAttributes(),recallInfo,complaints,getCarLogo(car.getMake()),MSRP);
             else {
-                decodedCar = new Car(car.getErrorCode(), car.getMake(), car.getModel(), car.getTrim(), car.getYear(), vin, carImages, car.getAttributes(), recallInfo,getCarLogo(car.getMake()),MSRP);
+                decodedCar = new Car(car.getErrorCode(), car.getMake(), car.getModel(), car.getTrim(), car.getYear(), vin,
+                                    carImages, car.getAttributes(), recallInfo,complaints,getCarLogo(car.getMake()),MSRP);
             }
 
 
@@ -128,6 +139,45 @@ public class QueryUtils {
         return recallInfo;
     }
 
+    private static ArrayList<CarComplaintAttribute> getComplaints(String jsonResponse) throws JSONException {
+        ArrayList<CarComplaintAttribute> complaints = new ArrayList<>();
+        JSONObject reader = new JSONObject(jsonResponse);
+        JSONArray arr = reader.getJSONArray("Results");
+
+        String odiNumber;
+        boolean crash = false;
+        boolean fire = false;
+        int numberInjured;
+        int numberDeaths;
+        String dateIncident = null;
+        String dateFiled;
+        String component;
+        String summary;
+        for(int i = 0; i < arr.length();i++){
+            reader = arr.getJSONObject(i);
+            odiNumber = reader.getString("ODINumber");
+            component = reader.getString("Component");
+            summary = reader.getString("Summary");
+            numberDeaths= reader.getInt("NumberOfDeaths");
+            numberInjured= reader.getInt("NumberOfInjured");
+            if(reader.has("DateofIncident")) {
+                dateIncident = reader.getString("DateofIncident");
+            }
+            dateFiled = reader.getString("DateComplaintFiled");
+            if(reader.getString("Crash") == "Yes"){
+                crash = true;
+            }
+            if(reader.getString("Fire") == "Yes"){
+                fire = true;
+            }
+            complaints.add(new CarComplaintAttribute(odiNumber,crash,fire,numberInjured,numberDeaths,
+                                                    dateIncident,dateFiled,component,summary));
+
+        }
+
+        return complaints;
+    }
+
     private static Car getCarInfo(String jsonResponse) throws JSONException {
         int errorCode = -1;
         String make = "";
@@ -166,7 +216,7 @@ public class QueryUtils {
 
 
 
-        return new Car(errorCode, make, model,trim, year, null, null, attributes,null,null,null);
+        return new Car(errorCode, make, model,trim, year, attributes);
 
     }
 

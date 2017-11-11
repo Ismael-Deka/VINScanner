@@ -35,15 +35,17 @@ public class CarRecallFragment extends Fragment {
 
         if(savedInstanceState == null) {
             recyclerView.setAdapter(new CarRecallAdapter(mCar.getRecallInfo(), getContext()));
-
+            if(mCar.getRecallInfo().size()>0){
+                emptyState.setVisibility(View.GONE);
+            }
         }else{
             recyclerView.setAdapter(readSavedInstance(savedInstanceState));
+            if(savedInstanceState.getInt("attrSize")>0){
+                emptyState.setVisibility(View.GONE);
+            }
         }
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        if(mCar.getRecallInfo().size()>0){
-            emptyState.setVisibility(View.GONE);
-        }
 
 
 

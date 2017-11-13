@@ -16,6 +16,7 @@ import com.example.vinscanner.ui.CarRecallFragment;
 public class CarInfoPagerAdapter extends FragmentPagerAdapter {
 
     private Car mCar;
+    private int mTotalFragments = 3;
     private String tabTitles[] = new String[] { "General", "Recalls", "Complaints"};
 
     public CarInfoPagerAdapter(FragmentManager manager){
@@ -42,7 +43,17 @@ public class CarInfoPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 3;
+        int recallNum = mCar.getRecallInfo().size();
+        int complaintNum = mCar.getComplaints().size();
+
+        if(recallNum == 0 && complaintNum == 0) {
+            return 1;
+        }else if(recallNum == 0 || complaintNum == 0){
+            return 2;
+        }else{
+            return 3;
+        }
+
     }
 
     @Override

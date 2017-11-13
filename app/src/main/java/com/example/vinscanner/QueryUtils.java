@@ -186,6 +186,7 @@ public class QueryUtils {
         JSONObject reader = new JSONObject(jsonResponse);
         JSONArray arr = reader.getJSONArray("Results");
 
+
         for(int i = 0; i < arr.length();i++) {
             reader = arr.getJSONObject(i);
             String variable = reader.getString("Variable");
@@ -315,9 +316,11 @@ public class QueryUtils {
         Elements element;
         ArrayList<String> imageUrls = new ArrayList<>();
 
+        //An string array of Image Urls are contained in this element as attributes
         element= doc.getElementsByTag("cui-lightbox");
         String galleryUrls = element.attr("images");
 
+        //MSRP stands for manufacturer's suggested retail price
         Elements msrp = doc.getElementsByClass("mmy-spec");
         Log.e(LOG_TAG,msrp.get(0).toString().split(": ")[1].replace("</li>",""));
         MSRP = msrp.get(0).toString().split(": ")[1].replace("</li>","");
@@ -328,7 +331,7 @@ public class QueryUtils {
             imageUrls.add(element.first().attr("src"));
         }else {
             String[] urls = galleryUrls.split("\"[&quot|&quot;,&quot;|&quot;]\"");
-            //Differentiate methods of extracting URLs for one of more images
+            //Differentiate methods of extracting URLs for one or more images
             if(urls.length>1) {
                 imageUrls.add(urls[0].substring(2));
                 Log.e(LOG_TAG, urls[0]);
@@ -343,8 +346,10 @@ public class QueryUtils {
             }
 
         }
+
+
         Bitmap[] carImages;
-        if(imageUrls.size()>8){
+        if(imageUrls.size()>8){//Limits the number of vehicle images to be downloaded to 8.
             carImages = new Bitmap[8];
         }else {
             carImages = new Bitmap[imageUrls.size()];

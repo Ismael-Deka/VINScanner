@@ -247,7 +247,11 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
 
             mProgressBar.setVisibility(View.INVISIBLE);
             mFab.setVisibility(View.VISIBLE);
-            mTabs.setVisibility(View.VISIBLE);
+            if(mCar.getRecallInfo().size() > 0 &&mCar.getComplaints().size() > 0){
+                mTabs.setVisibility(View.VISIBLE);
+            }else{
+                mTabs.setVisibility(View.GONE);
+            }
             mViewPager.setVisibility(View.VISIBLE);
 
 

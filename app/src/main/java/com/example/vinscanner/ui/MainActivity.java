@@ -5,7 +5,6 @@ import android.Manifest;
 import android.app.LoaderManager;
 import android.app.SearchManager;
 import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.CursorLoader;
@@ -104,18 +103,10 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
                 if (ContextCompat.checkSelfPermission(MainActivity.this,
                         Manifest.permission.CAMERA)
                         != PackageManager.PERMISSION_GRANTED) {
-                    // User may have declined earlier, ask Android if we should show him a reason
 
-
-                    if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.CAMERA)) {
-                        // show an explanation to the user
-                        // Good practise: don't block thread after the user sees the explanation, try again to request the permission.
-                    } else {
-                        // request the permission.
-                        // CALLBACK_NUMBER is a integer constants
                         ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.CAMERA}, PERMISSIONS_REQUEST_CAPTURE_IMAGE);
-                        // The callback method gets the result of the request.
-                    }
+
+
                 } else {
                     if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
                         Intent cameraIntent = new Intent(MainActivity.this,VinScannerActivity.class);
@@ -150,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
                 mVin = vinTextView.getText().toString();
 
                 Uri uri = ContentUris.withAppendedId(CarContract.CarEntry.CONTENT_URI, id);
-                startCarActivity(uri);
+                startCarActivity(uri,false);
 
             }
         });
@@ -313,44 +304,34 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
                 if(mVin.length()!=17){
                     mVin = vinBarcode.displayValue.substring(1);
                 }
-                startCarActivity(null);
+                startCarActivity(null,false);
             }
         }else if(resultCode == RESULT_OK){
             final String make = data.getStringExtra("make");
             final String model = data.getStringExtra("model");
             final String year = data.getStringExtra("year");
             final String vin = data.getStringExtra("vin");
-            Snackbar.make(mCarList,"Vehicle Deleted.", Snackbar.LENGTH_LONG).
+            Snackbar.make(mCarList,year+" "+make+ " "+model+" Deleted.", Snackbar.LENGTH_LONG).
                     setAction("Undo", new View.OnClickListener() {
 
                         @Override
                         public void onClick(View v) {
-
-                            Uri uri = restoreCar(make,model,year,vin);
-                            startCarActivity(uri);
+                            mVin = vin;
+                            startCarActivity(null,true);
                         }
 
                     }).show();
         }
     }
 
-    private Uri restoreCar(String make, String model, String year, String vin){
 
-        ContentValues values = new ContentValues();
-        values.put(CarContract.CarEntry.COLUMN_CAR_MAKE, make);
-        values.put(CarContract.CarEntry.COLUMN_CAR_MODEL, model);
-        values.put(CarContract.CarEntry.COLUMN_CAR_YEAR, year);
-        values.put(CarContract.CarEntry.COLUMN_CAR_VIN, vin);
-
-        return getContentResolver().insert(CarContract.CarEntry.CONTENT_URI, values);
-
-    }
-
-    private void startCarActivity(final Uri uri){
+    private void startCarActivity(final Uri uri, boolean restore){
         if(mVin != null){
             Intent carIntent = new Intent(MainActivity.this,CarActivity.class);
             carIntent.putExtra("Vin",mVin);
             carIntent.putExtra("Uri", uri);
+            carIntent.putExtra("restoreVehicle", restore);
+
             startActivityForResult(carIntent,2);
         }
 
@@ -389,14 +370,14 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
                 Log.e(LOG_TAG,vinIndex+"");
                 mVin = c.getString(vinIndex);
                 c.close();
-                startCarActivity(null);
+                startCarActivity(null,false);
             }else{
                 Toast.makeText(this,"Vehicle not found.", Toast.LENGTH_SHORT).show();
                 mSearchView.setQuery("",false);
             }
         }else if(query.length() == 17) {
             mVin = query.toUpperCase();
-            startCarActivity(null);
+            startCarActivity(null,false);
         } else{
             Toast.makeText(this,"Vehicle not found.", Toast.LENGTH_SHORT).show();
             mSearchView.setQuery("",false);

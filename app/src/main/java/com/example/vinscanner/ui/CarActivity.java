@@ -112,6 +112,7 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
         }else {
             mVin = savedInstanceState.getString("vin");
         }
+
         mIsVehicleSaved = isVehicleSaved();
 
 
@@ -156,9 +157,13 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
             Toast.makeText(this, "Failed to Save",
                     Toast.LENGTH_SHORT).show();
         } else {
-
-            Toast.makeText(this, "Saved",
-                    Toast.LENGTH_SHORT).show();
+            if(getIntent().getBooleanExtra("restoreVehicle",false)){
+                Toast.makeText(this, "Vehicle Restored",
+                        Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(this, "Saved",
+                        Toast.LENGTH_SHORT).show();
+            }
             saveCarLogo();
 
             mUri = newUri;
@@ -294,6 +299,10 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
 
                 }
             });
+
+            if(getIntent().getBooleanExtra("restoreVehicle",false)){
+                saveCar();
+            }
 
 
 

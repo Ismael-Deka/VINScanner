@@ -117,7 +117,6 @@ public class CarComplaintAdapter extends RecyclerView.Adapter<CarComplaintAdapte
         infoComponent = infoComponent.substring(0, 1) + infoComponent.substring(1, infoComponent.length()).toLowerCase();
 
         component.setText(Html.fromHtml("<b>Complaint Subject:</b>" + "\n" + infoComponent));
-
         date.setText(info.getDateFiled());
         summary.setText(Html.fromHtml("<b>Summary:</b>" + "\n" + info.getSummary()));
         numInjured.setText(Html.fromHtml("<b>Number of Injuries:</b>" + "\n" + info.getNumberInjured()));

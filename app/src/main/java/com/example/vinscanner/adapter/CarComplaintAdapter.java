@@ -20,6 +20,7 @@ import java.util.HashMap;
 
 import static com.example.vinscanner.R.id.date;
 
+
 /**
  * Created by Ismael on 11/11/2017.
  */
@@ -48,7 +49,6 @@ public class CarComplaintAdapter extends RecyclerView.Adapter<CarComplaintAdapte
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
         public TextView componentTextView;
-        public TextView odiTextView;
         public TextView summaryTextView;
         public TextView numInjuredTextView;
         public TextView numDeadTextView;
@@ -64,7 +64,6 @@ public class CarComplaintAdapter extends RecyclerView.Adapter<CarComplaintAdapte
         public ViewHolder(View itemView) {
             super(itemView);
             componentTextView = (TextView) itemView.findViewById(R.id.component);
-            odiTextView = (TextView) itemView.findViewById(R.id.odi);
             datefiledTextView = (TextView) itemView.findViewById(date);
             summaryTextView = (TextView)itemView.findViewById(R.id.summary);
             numInjuredTextView = (TextView)itemView.findViewById(R.id.num_injured);
@@ -102,7 +101,7 @@ public class CarComplaintAdapter extends RecyclerView.Adapter<CarComplaintAdapte
 
 
         TextView component = holder.componentTextView;
-        TextView odi = holder.odiTextView;
+
         TextView date = holder.datefiledTextView;
         final TextView dateIncident = holder.dateIncidentTextView;
         final TextView crash = holder.crashTextView;
@@ -118,7 +117,7 @@ public class CarComplaintAdapter extends RecyclerView.Adapter<CarComplaintAdapte
         infoComponent = infoComponent.substring(0, 1) + infoComponent.substring(1, infoComponent.length()).toLowerCase();
 
         component.setText(Html.fromHtml("<b>Complaint Subject:</b>" + "\n" + infoComponent));
-        odi.setText(Html.fromHtml("<b>ODINumber:</b> " + "" + info.getODINumber() + ""));
+
         date.setText(info.getDateFiled());
         summary.setText(Html.fromHtml("<b>Summary:</b>" + "\n" + info.getSummary()));
         numInjured.setText(Html.fromHtml("<b>Number of Injuries:</b>" + "\n" + info.getNumberInjured()));
@@ -131,7 +130,6 @@ public class CarComplaintAdapter extends RecyclerView.Adapter<CarComplaintAdapte
             summary.setVisibility(View.VISIBLE);
             numInjured.setVisibility(View.VISIBLE);
             numDead.setVisibility(View.VISIBLE);
-            odi.setVisibility(View.VISIBLE);
             crash.setVisibility(View.VISIBLE);
             fire.setVisibility(View.VISIBLE);
             showMore.setImageResource(R.drawable.ic_keyboard_arrow_up_black_24dp);
@@ -139,7 +137,6 @@ public class CarComplaintAdapter extends RecyclerView.Adapter<CarComplaintAdapte
             summary.setVisibility(View.GONE);
             numInjured.setVisibility(View.GONE);
             numDead.setVisibility(View.GONE);
-            odi.setVisibility(View.GONE);
             crash.setVisibility(View.GONE);
             fire.setVisibility(View.GONE);
             showMore.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
@@ -152,7 +149,6 @@ public class CarComplaintAdapter extends RecyclerView.Adapter<CarComplaintAdapte
                     summary.setVisibility(View.VISIBLE);
                     numInjured.setVisibility(View.VISIBLE);
                     numDead.setVisibility(View.VISIBLE);
-                    dateIncident.setVisibility(View.VISIBLE);
                     crash.setVisibility(View.VISIBLE);
                     fire.setVisibility(View.VISIBLE);
                     showMore.setImageResource(R.drawable.ic_keyboard_arrow_up_black_24dp);
@@ -162,7 +158,6 @@ public class CarComplaintAdapter extends RecyclerView.Adapter<CarComplaintAdapte
                     summary.setVisibility(View.GONE);
                     numInjured.setVisibility(View.GONE);
                     numDead.setVisibility(View.GONE);
-                    dateIncident.setVisibility(View.GONE);
                     crash.setVisibility(View.GONE);
                     fire.setVisibility(View.GONE);
                     showMore.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp);

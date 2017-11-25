@@ -1,4 +1,4 @@
-package com.example.vinscanner.car;
+package com.ismaelDeka.vinscanner.car;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

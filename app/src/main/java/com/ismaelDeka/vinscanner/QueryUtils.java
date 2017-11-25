@@ -1,13 +1,13 @@
-package com.example.vinscanner;
+package com.ismaelDeka.vinscanner;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 
-import com.example.vinscanner.car.Car;
-import com.example.vinscanner.car.CarAttribute;
-import com.example.vinscanner.car.CarComplaintAttribute;
-import com.example.vinscanner.car.RecallAttribute;
+import com.ismaelDeka.vinscanner.car.Car;
+import com.ismaelDeka.vinscanner.car.CarAttribute;
+import com.ismaelDeka.vinscanner.car.CarComplaintAttribute;
+import com.ismaelDeka.vinscanner.car.RecallAttribute;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,7 +26,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
-import static com.example.vinscanner.ui.MainActivity.LOG_TAG;
+import static com.ismaelDeka.vinscanner.ui.MainActivity.LOG_TAG;
 
 /**
  * Created by Ismael on 2/21/2017.

@@ -1,4 +1,4 @@
-package com.example.vinscanner;
+package com.ismaelDeka.vinscanner;
 
 import java.util.Arrays;
 

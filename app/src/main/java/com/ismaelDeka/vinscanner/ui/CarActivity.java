@@ -1,4 +1,4 @@
-package com.example.vinscanner.ui;
+package com.ismaelDeka.vinscanner.ui;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -27,19 +27,19 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.example.vinscanner.CarLoader;
-import com.example.vinscanner.R;
-import com.example.vinscanner.adapter.CarImagePagerAdapter;
-import com.example.vinscanner.adapter.CarInfoPagerAdapter;
-import com.example.vinscanner.car.Car;
-import com.example.vinscanner.db.CarContract;
+import com.ismaelDeka.vinscanner.CarLoader;
+import com.ismaelDeka.vinscanner.R;
+import com.ismaelDeka.vinscanner.adapter.CarImagePagerAdapter;
+import com.ismaelDeka.vinscanner.adapter.CarInfoPagerAdapter;
+import com.ismaelDeka.vinscanner.car.Car;
+import com.ismaelDeka.vinscanner.db.CarContract;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import static com.example.vinscanner.R.id.fab;
-import static com.example.vinscanner.R.id.toolbar;
+import static com.ismaelDeka.vinscanner.R.id.fab;
+import static com.ismaelDeka.vinscanner.R.id.toolbar;
 
 public class CarActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Car>{
 

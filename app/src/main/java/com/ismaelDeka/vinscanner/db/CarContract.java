@@ -1,4 +1,4 @@
-package com.example.vinscanner.db;
+package com.ismaelDeka.vinscanner.db;
 
 import android.content.ContentResolver;
 import android.net.Uri;
@@ -15,7 +15,7 @@ public class CarContract {
     }
 
 
-    public static final String CONTENT_AUTHORITY = "com.example.vinscanner";
+    public static final String CONTENT_AUTHORITY = "com.ismaelDeka.vinscanner";
 
 
     private static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);

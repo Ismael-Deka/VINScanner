@@ -1,4 +1,4 @@
-package com.example.vinscanner.adapter;
+package com.ismaelDeka.vinscanner.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import com.example.vinscanner.R;
+import com.ismaelDeka.vinscanner.R;
 
 /**
  * Created by Ismael on 3/17/2017.

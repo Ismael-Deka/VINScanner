@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.vinscanner">
+    package="com.ismaelDeka.vinscanner"
+    android:versionCode="2">
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -13,7 +14,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.MainActivity">
+        <activity android:name="com.ismaelDeka.vinscanner.ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -28,19 +29,19 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".ui.VinScannerActivity"
+            android:name="com.ismaelDeka.vinscanner.ui.VinScannerActivity"
             android:label="@string/title_activity_vin_scanner"
-            android:parentActivityName=".ui.MainActivity"
+            android:parentActivityName="com.ismaelDeka.vinscanner.ui.MainActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"></activity>
 
 
-        <activity android:name=".ui.CarActivity"
-            android:parentActivityName=".ui.MainActivity"
+        <activity android:name="com.ismaelDeka.vinscanner.ui.CarActivity"
+            android:parentActivityName="com.ismaelDeka.vinscanner.ui.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"></activity>
         <provider
-            android:authorities="com.example.vinscanner"
-            android:name=".db.CarProvider"
+            android:authorities="com.ismaelDeka.vinscanner"
+            android:name="com.ismaelDeka.vinscanner.db.CarProvider"
             android:exported="false"/>
     </application>
 

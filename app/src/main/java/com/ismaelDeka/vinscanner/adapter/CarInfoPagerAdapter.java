@@ -1,13 +1,13 @@
-package com.example.vinscanner.adapter;
+package com.ismaelDeka.vinscanner.adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.example.vinscanner.car.Car;
-import com.example.vinscanner.ui.CarComplaintFragment;
-import com.example.vinscanner.ui.CarInfoFragment;
-import com.example.vinscanner.ui.CarRecallFragment;
+import com.ismaelDeka.vinscanner.car.Car;
+import com.ismaelDeka.vinscanner.ui.CarComplaintFragment;
+import com.ismaelDeka.vinscanner.ui.CarInfoFragment;
+import com.ismaelDeka.vinscanner.ui.CarRecallFragment;
 
 /**
  * Created by Ismael on 4/20/2017.

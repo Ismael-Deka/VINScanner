@@ -1,4 +1,4 @@
-package com.example.vinscanner.adapter;
+package com.ismaelDeka.vinscanner.adapter;
 
 import android.content.ContentUris;
 import android.content.Context;
@@ -19,8 +19,8 @@ import android.view.animation.TranslateAnimation;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.example.vinscanner.R;
-import com.example.vinscanner.db.CarContract;
+import com.ismaelDeka.vinscanner.R;
+import com.ismaelDeka.vinscanner.db.CarContract;
 
 import java.io.File;
 import java.io.FileInputStream;

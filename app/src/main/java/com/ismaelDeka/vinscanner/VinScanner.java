@@ -1,4 +1,4 @@
-package com.example.vinscanner;
+package com.ismaelDeka.vinscanner;
 
 import android.content.Context;
 import android.content.Intent;

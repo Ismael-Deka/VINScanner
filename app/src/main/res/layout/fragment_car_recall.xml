@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context="com.example.vinscanner.ui.CarRecallFragment">
+    tools:context="com.ismaelDeka.vinscanner.ui.CarRecallFragment">
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recall_list"
         android:layout_width="match_parent"

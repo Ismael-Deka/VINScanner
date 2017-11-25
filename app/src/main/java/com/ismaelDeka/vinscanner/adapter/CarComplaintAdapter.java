@@ -1,4 +1,4 @@
-package com.example.vinscanner.adapter;
+package com.ismaelDeka.vinscanner.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.CardView;
@@ -11,14 +11,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.vinscanner.R;
-import com.example.vinscanner.car.CarComplaintAttribute;
+import com.ismaelDeka.vinscanner.R;
+import com.ismaelDeka.vinscanner.car.CarComplaintAttribute;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-import static com.example.vinscanner.R.id.date;
+import static com.ismaelDeka.vinscanner.R.id.date;
 
 
 /**

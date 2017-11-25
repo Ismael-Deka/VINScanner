@@ -1,10 +1,10 @@
-package com.example.vinscanner;
+package com.ismaelDeka.vinscanner;
 
 import android.app.Activity;
 import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
-import com.example.vinscanner.car.Car;
+import com.ismaelDeka.vinscanner.car.Car;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.GooglePlayServicesUtil;

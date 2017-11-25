@@ -1,4 +1,4 @@
-package com.example.vinscanner.adapter;
+package com.ismaelDeka.vinscanner.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -12,8 +12,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.vinscanner.R;
-import com.example.vinscanner.car.CarAttribute;
+import com.ismaelDeka.vinscanner.R;
+import com.ismaelDeka.vinscanner.car.CarAttribute;
 
 import java.util.ArrayList;
 import java.util.Collections;

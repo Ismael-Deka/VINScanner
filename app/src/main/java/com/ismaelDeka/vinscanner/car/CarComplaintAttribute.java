@@ -1,4 +1,4 @@
-package com.example.vinscanner.car;
+package com.ismaelDeka.vinscanner.car;
 
 /**
  * Created by Ismael on 11/11/2017.

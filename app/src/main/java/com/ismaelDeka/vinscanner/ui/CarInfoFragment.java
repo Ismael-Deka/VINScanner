@@ -1,4 +1,4 @@
-package com.example.vinscanner.ui;
+package com.ismaelDeka.vinscanner.ui;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,10 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.vinscanner.R;
-import com.example.vinscanner.adapter.CarInfoAdapter;
-import com.example.vinscanner.car.Car;
-import com.example.vinscanner.car.CarAttribute;
+import com.ismaelDeka.vinscanner.R;
+import com.ismaelDeka.vinscanner.adapter.CarInfoAdapter;
+import com.ismaelDeka.vinscanner.car.Car;
+import com.ismaelDeka.vinscanner.car.CarAttribute;
 
 import java.util.ArrayList;
 

@@ -1,4 +1,4 @@
-package com.example.vinscanner.db;
+package com.ismaelDeka.vinscanner.db;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

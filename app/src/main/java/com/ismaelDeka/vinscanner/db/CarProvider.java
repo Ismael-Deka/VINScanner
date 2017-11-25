@@ -1,4 +1,4 @@
-package com.example.vinscanner.db;
+package com.ismaelDeka.vinscanner.db;
 
 import android.content.ContentProvider;
 import android.content.ContentUris;

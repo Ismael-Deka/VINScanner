@@ -1,4 +1,4 @@
-package com.example.vinscanner.ui;
+package com.ismaelDeka.vinscanner.ui;
 
 
 import android.Manifest;
@@ -39,9 +39,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.vinscanner.R;
-import com.example.vinscanner.adapter.CarCursorAdapter;
-import com.example.vinscanner.db.CarContract;
+import com.ismaelDeka.vinscanner.R;
+import com.ismaelDeka.vinscanner.adapter.CarCursorAdapter;
+import com.ismaelDeka.vinscanner.db.CarContract;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.barcode.Barcode;
 

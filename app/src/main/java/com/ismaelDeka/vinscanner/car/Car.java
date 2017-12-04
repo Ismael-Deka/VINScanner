@@ -28,6 +28,10 @@ public class Car {
 
     }
 
+    public Car(String vin){
+        mVin = vin;
+    }
+
     public Car (int newErrorCode, String newMake,String newModel, String newTrim, String newYear,ArrayList<CarAttribute> newAttributes){
         mErrorCode = newErrorCode;
         if(newMake != null) {
@@ -61,6 +65,14 @@ public class Car {
         mComplaints = newComplaints;
 
 
+    }
+
+    public boolean isCarInfoAvailable(){
+        if(mModel == null || mRecallInfo == null || mComplaints == null){
+            return false;
+        }else {
+            return true;
+        }
     }
 
 

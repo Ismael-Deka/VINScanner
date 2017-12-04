@@ -61,9 +61,15 @@ public class VinScanner implements Camera.PreviewCallback {
         if(barcodes.size() > 0) {
             Intent i = new Intent();
             Barcode barcode = barcodes.valueAt(0);
-            if(!barcode.displayValue.contains(" ")) {
-                Toast.makeText(mContext,"VIN: "+barcode.displayValue.substring(1),Toast.LENGTH_SHORT).show();
-                if (!mIsVibrateOnce)
+            String vin;
+            if(barcode.displayValue.length() > 17)
+                vin= barcode.displayValue.substring(1);
+            else
+                vin = barcode.displayValue;
+
+            if(vin.matches("[a-zA-Z0-9]*")) {
+                if(!mIsVibrateOnce)
+                    Toast.makeText(mContext, "VIN: " + vin, Toast.LENGTH_SHORT).show();
                     vibrate();
                 Log.e(TAG, "Barcode Found.");
                 mCallback.onVinFound(barcode);

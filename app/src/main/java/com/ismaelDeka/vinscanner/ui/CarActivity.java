@@ -241,6 +241,10 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
     @Override
     public void onLoadFinished(Loader<Car> loader, Car car) {
 
+        if(!car.isCarInfoAvailable()){
+            Toast.makeText(this, "Failed to retrieve Vehicle Information.", Toast.LENGTH_LONG).show();
+            startActivity(getParentActivityIntent());
+        }
 
         if(validateVin(car.getErrorCode())) {
 

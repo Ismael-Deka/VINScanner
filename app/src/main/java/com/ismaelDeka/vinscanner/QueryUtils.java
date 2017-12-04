@@ -57,6 +57,10 @@ public class QueryUtils {
             Log.e(LOG_TAG,vin);
             String jsonResponse = makeHttpRequest(createUrl(vinUrl));
 
+            if(jsonResponse == null){
+                return new Car(vin);
+            }
+
             Car car = getCarInfo(jsonResponse);
             String recallUrl;
             String complaintUrl;
@@ -72,9 +76,17 @@ public class QueryUtils {
             Log.e(LOG_TAG,recallUrl);
             jsonResponse = makeHttpRequest(createUrl(recallUrl));
 
+            if(jsonResponse == null){
+                return new Car(vin);
+            }
+
             ArrayList<RecallAttribute> recallInfo = getRecallInfo(jsonResponse);
 
             jsonResponse = makeHttpRequest(createUrl(complaintUrl));
+
+            if(jsonResponse == null){
+                return new Car(vin);
+            }
 
             ArrayList<CarComplaintAttribute> complaints = getComplaints(jsonResponse);
 
@@ -247,7 +259,7 @@ public class QueryUtils {
         } catch (IOException e) {
             Log.e(LOG_TAG, "Problem retrieving the response.", e);
         } finally {
-            if (urlConnection != null) {
+            if (urlConnection != null&&inputStream!=null) {
                 urlConnection.disconnect();
                 inputStream.close();
             }

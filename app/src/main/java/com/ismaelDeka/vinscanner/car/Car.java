@@ -30,6 +30,9 @@ public class Car {
 
     public Car(String vin){
         mVin = vin;
+        mModel = null;
+        mRecallInfo = null;
+        mComplaints = null;
     }
 
     public Car (int newErrorCode, String newMake,String newModel, String newTrim, String newYear,ArrayList<CarAttribute> newAttributes){

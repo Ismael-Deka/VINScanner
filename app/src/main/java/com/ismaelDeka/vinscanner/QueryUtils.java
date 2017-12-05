@@ -238,7 +238,7 @@ public class QueryUtils {
             return null;
         }
 
-        String response = "";
+        String response = null;
         HttpURLConnection urlConnection = null;
         InputStream inputStream = null;
         try {
@@ -253,11 +253,13 @@ public class QueryUtils {
             if (urlConnection.getResponseCode() == 200) {
                 inputStream = urlConnection.getInputStream();
                 response = readFromStream(inputStream);
+
             } else {
                 Log.e(LOG_TAG, "Error response code: " + urlConnection.getResponseCode());
             }
         } catch (IOException e) {
             Log.e(LOG_TAG, "Problem retrieving the response.", e);
+
         } finally {
             if (urlConnection != null&&inputStream!=null) {
                 urlConnection.disconnect();

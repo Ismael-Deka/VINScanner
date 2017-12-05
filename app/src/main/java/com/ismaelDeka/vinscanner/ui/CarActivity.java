@@ -20,6 +20,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -27,6 +28,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.CommonStatusCodes;
 import com.ismaelDeka.vinscanner.CarLoader;
 import com.ismaelDeka.vinscanner.R;
 import com.ismaelDeka.vinscanner.adapter.CarImagePagerAdapter;
@@ -242,78 +244,76 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
     public void onLoadFinished(Loader<Car> loader, Car car) {
 
         if(!car.isCarInfoAvailable()){
-            Toast.makeText(this, "Failed to retrieve Vehicle Information.", Toast.LENGTH_LONG).show();
-            startActivity(getParentActivityIntent());
-        }
+            Intent intent = new Intent();
+            Log.e("CarActivity", "no info available");
+            intent.putExtra("vin_failed",car.getVin());
+            setResult(CommonStatusCodes.NETWORK_ERROR ,intent);
+            finish();
+        }else {
 
-        if(validateVin(car.getErrorCode())) {
+            if (validateVin(car.getErrorCode())) {
 
-            mCar = car;
+                mCar = car;
 
-            if(mIsVehicleSaved){
-                mFab.setImageResource(R.drawable.ic_delete_forever_white_24dp);
-            }
-
-            mProgressBar.setVisibility(View.INVISIBLE);
-            mFab.setVisibility(View.VISIBLE);
-            if(mCar.getRecallInfo().size() > 0 &&mCar.getComplaints().size() > 0){
-                mTabs.setVisibility(View.VISIBLE);
-            }else{
-                mTabs.setVisibility(View.GONE);
-            }
-            mViewPager.setVisibility(View.VISIBLE);
-
-
-
-
-
-            CarInfoPagerAdapter carInfoPagerAdapter = new CarInfoPagerAdapter(getSupportFragmentManager());
-            carInfoPagerAdapter.setCar(car);
-            mViewPager.setAdapter(carInfoPagerAdapter);
-            mTabs.setTabTextColors(Color.BLACK, Color.WHITE);
-            mTabs.setSelectedTabIndicatorColor(Color.WHITE);
-            mTabs.setupWithViewPager(mViewPager);
-
-            mToolbarLayout.setTitle(car.getYear()+" "+car.getMake()+" "+car.getModel());
-
-            if(car.getCarImages() != null) {
-                Bitmap[] galleryImages = car.getCarImages();
-                CarImagePagerAdapter carImageAdapter = new CarImagePagerAdapter(CarActivity.this,galleryImages);
-                mAppBarLayout.setExpanded(true,true);
-                mGallery.setAdapter(carImageAdapter);
-                if(galleryImages.length > 1)
-                    mTabDots.setupWithViewPager(mGallery);
-                }else{
-                mImageNotFound.setVisibility(View.VISIBLE);
-            }
-
-
-
-            mFab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    if(mUri!=null){
-                        deleteCar(mUri);
-                    }else{
-                        mFab.setImageResource(R.drawable.ic_delete_forever_white_24dp);
-                        saveCar();
-                    }
-
-
+                if (mIsVehicleSaved) {
+                    mFab.setImageResource(R.drawable.ic_delete_forever_white_24dp);
                 }
-            });
 
-            if(getIntent().getBooleanExtra("restoreVehicle",false)){
-                saveCar();
+                mProgressBar.setVisibility(View.INVISIBLE);
+                mFab.setVisibility(View.VISIBLE);
+                if (mCar.getRecallInfo().size() > 0 && mCar.getComplaints().size() > 0) {
+                    mTabs.setVisibility(View.VISIBLE);
+                } else {
+                    mTabs.setVisibility(View.GONE);
+                }
+                mViewPager.setVisibility(View.VISIBLE);
+
+
+                CarInfoPagerAdapter carInfoPagerAdapter = new CarInfoPagerAdapter(getSupportFragmentManager());
+                carInfoPagerAdapter.setCar(car);
+                mViewPager.setAdapter(carInfoPagerAdapter);
+                mTabs.setTabTextColors(Color.BLACK, Color.WHITE);
+                mTabs.setSelectedTabIndicatorColor(Color.WHITE);
+                mTabs.setupWithViewPager(mViewPager);
+
+                mToolbarLayout.setTitle(car.getYear() + " " + car.getMake() + " " + car.getModel());
+
+                if (car.getCarImages() != null) {
+                    Bitmap[] galleryImages = car.getCarImages();
+                    CarImagePagerAdapter carImageAdapter = new CarImagePagerAdapter(CarActivity.this, galleryImages);
+                    mAppBarLayout.setExpanded(true, true);
+                    mGallery.setAdapter(carImageAdapter);
+                    if (galleryImages.length > 1)
+                        mTabDots.setupWithViewPager(mGallery);
+                } else {
+                    mImageNotFound.setVisibility(View.VISIBLE);
+                }
+
+
+                mFab.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        if (mUri != null) {
+                            deleteCar(mUri);
+                        } else {
+                            mFab.setImageResource(R.drawable.ic_delete_forever_white_24dp);
+                            saveCar();
+                        }
+
+
+                    }
+                });
+
+                if (getIntent().getBooleanExtra("restoreVehicle", false)) {
+                    saveCar();
+                }
+
+
             }
 
-
-
+            getSupportLoaderManager().destroyLoader(1);
         }
-
-        getSupportLoaderManager().destroyLoader(1);
-
     }
 
     @Override

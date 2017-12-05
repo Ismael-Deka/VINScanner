@@ -39,11 +39,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.vision.barcode.Barcode;
 import com.ismaelDeka.vinscanner.R;
 import com.ismaelDeka.vinscanner.adapter.CarCursorAdapter;
 import com.ismaelDeka.vinscanner.db.CarContract;
-import com.google.android.gms.common.api.CommonStatusCodes;
-import com.google.android.gms.vision.barcode.Barcode;
 
 import java.io.File;
 
@@ -311,13 +311,24 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
             final String model = data.getStringExtra("model");
             final String year = data.getStringExtra("year");
             final String vin = data.getStringExtra("vin");
-            Snackbar.make(mCarList,year+" "+make+ " "+model+" Deleted.", Snackbar.LENGTH_LONG).
+            Snackbar.make(mCarList,year+" "+make+ " "+model+" Deleted.", Snackbar.LENGTH_INDEFINITE).
                     setAction("Undo", new View.OnClickListener() {
 
                         @Override
                         public void onClick(View v) {
                             mVin = vin;
                             startCarActivity(null,true);
+                        }
+
+                    }).show();
+        }else if(resultCode == CommonStatusCodes.NETWORK_ERROR){
+            mVin = data.getStringExtra("vin_failed");
+            Snackbar.make(mCarList,"Failed to retrieve Vehicle Information.",Snackbar.LENGTH_INDEFINITE).
+                    setAction("Retry", new View.OnClickListener() {
+
+                        @Override
+                        public void onClick(View v) {
+                            startCarActivity(null,false);
                         }
 
                     }).show();

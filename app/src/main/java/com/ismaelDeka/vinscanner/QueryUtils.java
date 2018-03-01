@@ -25,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import static com.ismaelDeka.vinscanner.ui.MainActivity.LOG_TAG;
 
@@ -328,39 +329,50 @@ public class QueryUtils {
         }
 
         Elements element;
+        String galleryUrls;
         ArrayList<String> imageUrls = new ArrayList<>();
 
         //An string array of Image Urls are contained in this element as attributes
-        element= doc.getElementsByTag("cui-lightbox");
-        String galleryUrls = element.attr("images");
-
-        //MSRP stands for manufacturer's suggested retail price
-        Elements msrp = doc.getElementsByClass("mmy-spec");
-        Log.e(LOG_TAG,msrp.get(0).toString().split(": ")[1].replace("</li>",""));
-        MSRP = msrp.get(0).toString().split(": ")[1].replace("</li>","");
+        element= doc.getElementsByClass("cui-button banilla-lightbox-launch");
+        if(!element.isEmpty()) {
+            galleryUrls = element.attr("data-banilla-lightbox-content");
 
 
-        if(galleryUrls.isEmpty()){
-            element= doc.getElementsByAttributeValueContaining("class", "slide nonDraggableImage");
-            imageUrls.add(element.first().attr("src"));
-        }else {
-            String[] urls = galleryUrls.split("\"[&quot|&quot;,&quot;|&quot;]\"");
-            //Differentiate methods of extracting URLs for one or more images
-            if(urls.length>1) {
-                imageUrls.add(urls[0].substring(2));
-                Log.e(LOG_TAG, urls[0]);
-                for (int i = 1; i < urls.length - 1; i++) {
-                    imageUrls.add(urls[i]);
+            if (galleryUrls.isEmpty()) {
+                element = doc.getElementsByAttributeValueContaining("class", "slide nonDraggableImage");
+                imageUrls.add(element.first().attr("src"));
+            } else {
+                galleryUrls = galleryUrls.replace("{\"photos\":[{\"isPhoto\":true,\"index\":0,\"url\":\"", "");
+                galleryUrls = galleryUrls.replace(",{\"position\":3,\"size\":\"cube\",\"slot\":\"6427/buy.research/ymm.photo.iab\"}", "");
+                galleryUrls = galleryUrls.replace("\"},{\"isPhoto\":true,\"index\"", ",");
+                galleryUrls = galleryUrls.replaceAll(",:\\d,", ";;;;");
+                galleryUrls = galleryUrls.replaceAll(",:\\d\\d,", ";;;;");
+                galleryUrls = galleryUrls.replace("\"url\":\"", "");
+                galleryUrls = galleryUrls.replace("\"}],\"photoCount\":17,\"videoCount\":1,\"videos\":[23003834001],\"sponsoredVideos\":[],\"brightcovePlayerId\":\"SkW2Puhzg\",\"sponsoredBrightcovePlayerId\":\"rkUxc2xfx\"}", "");
+
+                String[] urls = galleryUrls.split(";;;;");
+                Log.e(LOG_TAG, urls.toString());
+                //Differentiate methods of extracting URLs for one or more images
+                if (urls.length > 1) {
+                    Collections.addAll(imageUrls, urls);
+                } else {
+                    galleryUrls = galleryUrls.replace("[\"", "").replace("\"]", "");
+                    imageUrls.add(galleryUrls);
                 }
-                String lastUrl = urls[urls.length - 1];
-                imageUrls.add(lastUrl.substring(0, lastUrl.length() - 2));
-            }else {
-                galleryUrls = galleryUrls.replace("[\"","").replace("\"]","");
-                imageUrls.add(galleryUrls);
+
             }
-
+        }else {
+            element= doc.getElementsByClass("cui-page-section__bg no-landscape");
+            galleryUrls = element.first().getElementsByTag("img").attr("src");
+            imageUrls.add(galleryUrls);
         }
-
+        //MSRP stands for manufacturer's suggested retail price
+        Elements msrp = doc.getElementsByClass("mmy-header__msrp");
+        String price = msrp.get(0).toString();
+        price = price.replace("<div class=\"mmy-header__msrp\">","");
+        price = price.replace("<b>Inventory Prices</b> \n</div>","");
+        Log.e(LOG_TAG,price);
+        MSRP = price;
 
         Bitmap[] carImages;
         if(imageUrls.size()>8){//Limits the number of vehicle images to be downloaded to 8.

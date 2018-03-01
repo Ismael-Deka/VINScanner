@@ -20,7 +20,6 @@ import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -245,7 +244,6 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
 
         if(!car.isCarInfoAvailable()){
             Intent intent = new Intent();
-            Log.e("CarActivity", "no info available");
             intent.putExtra("vin_failed",car.getVin());
             setResult(CommonStatusCodes.NETWORK_ERROR ,intent);
             finish();

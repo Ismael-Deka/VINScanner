@@ -332,7 +332,7 @@ public class QueryUtils {
         String galleryUrls;
         ArrayList<String> imageUrls = new ArrayList<>();
 
-        //An string array of Image Urls are contained in this element as attributes
+        //A string array of Image Urls are contained in this element as attributes
         element= doc.getElementsByClass("cui-button banilla-lightbox-launch");
         if(!element.isEmpty()) {
             galleryUrls = element.attr("data-banilla-lightbox-content");
@@ -362,17 +362,18 @@ public class QueryUtils {
 
             }
         }else {
-            element= doc.getElementsByClass("cui-page-section__bg no-landscape");
-            galleryUrls = element.first().getElementsByTag("img").attr("src");
-            imageUrls.add(galleryUrls);
+            return null;//If no picture can be found.
         }
         //MSRP stands for manufacturer's suggested retail price
         Elements msrp = doc.getElementsByClass("mmy-header__msrp");
-        String price = msrp.get(0).toString();
-        price = price.replace("<div class=\"mmy-header__msrp\">","");
-        price = price.replace("<b>Inventory Prices</b> \n</div>","");
-        Log.e(LOG_TAG,price);
-        MSRP = price;
+        if(!msrp.isEmpty()) {
+            String price = msrp.get(0).toString();
+            price = price.replace("<div class=\"mmy-header__msrp\">", "");
+            price = price.replace("<b>Inventory Prices</b> \n</div>", "");
+            price = price.replace(" ","");
+            Log.e(LOG_TAG, price);
+            MSRP = price;
+        }
 
         Bitmap[] carImages;
         if(imageUrls.size()>8){//Limits the number of vehicle images to be downloaded to 8.

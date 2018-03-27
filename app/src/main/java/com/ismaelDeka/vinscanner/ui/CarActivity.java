@@ -234,6 +234,36 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
         }
     }
 
+    private void exitFailedActivity(){
+        Intent intent = new Intent();
+        intent.putExtra("vin_failed",mVin);
+        setResult(CommonStatusCodes.NETWORK_ERROR ,intent);
+        finish();
+    }
+
+    private void displayVehicleImages(Car car){
+        CarInfoPagerAdapter carInfoPagerAdapter = new CarInfoPagerAdapter(getSupportFragmentManager());
+        carInfoPagerAdapter.setCar(car);
+        mViewPager.setAdapter(carInfoPagerAdapter);
+        mTabs.setTabTextColors(Color.BLACK, Color.WHITE);
+        mTabs.setSelectedTabIndicatorColor(Color.WHITE);
+        mTabs.setupWithViewPager(mViewPager);
+
+        mToolbarLayout.setTitle(car.getYear() + " " + car.getMake() + " " + car.getModel());
+
+        if (car.getCarImages() != null) {
+            Bitmap[] galleryImages = car.getCarImages();
+            CarImagePagerAdapter carImageAdapter = new CarImagePagerAdapter(CarActivity.this, galleryImages);
+            mAppBarLayout.setExpanded(true, true);
+            mGallery.setAdapter(carImageAdapter);
+            if (galleryImages.length > 1)
+                mTabDots.setupWithViewPager(mGallery);
+        } else {
+            mImageNotFound.setVisibility(View.VISIBLE);
+        }
+
+    }
+
     @Override
     public Loader<Car> onCreateLoader(int i, Bundle bundle) {
         return new CarLoader(this,mVin);
@@ -242,11 +272,10 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
     @Override
     public void onLoadFinished(Loader<Car> loader, Car car) {
 
-        if(!car.isCarInfoAvailable()){
-            Intent intent = new Intent();
-            intent.putExtra("vin_failed",car.getVin());
-            setResult(CommonStatusCodes.NETWORK_ERROR ,intent);
-            finish();
+        if(car == null){
+            exitFailedActivity();
+        }else if(!car.isCarInfoAvailable()){
+            exitFailedActivity();
         }else {
 
             if (validateVin(car.getErrorCode())) {
@@ -266,26 +295,7 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
                 }
                 mViewPager.setVisibility(View.VISIBLE);
 
-
-                CarInfoPagerAdapter carInfoPagerAdapter = new CarInfoPagerAdapter(getSupportFragmentManager());
-                carInfoPagerAdapter.setCar(car);
-                mViewPager.setAdapter(carInfoPagerAdapter);
-                mTabs.setTabTextColors(Color.BLACK, Color.WHITE);
-                mTabs.setSelectedTabIndicatorColor(Color.WHITE);
-                mTabs.setupWithViewPager(mViewPager);
-
-                mToolbarLayout.setTitle(car.getYear() + " " + car.getMake() + " " + car.getModel());
-
-                if (car.getCarImages() != null) {
-                    Bitmap[] galleryImages = car.getCarImages();
-                    CarImagePagerAdapter carImageAdapter = new CarImagePagerAdapter(CarActivity.this, galleryImages);
-                    mAppBarLayout.setExpanded(true, true);
-                    mGallery.setAdapter(carImageAdapter);
-                    if (galleryImages.length > 1)
-                        mTabDots.setupWithViewPager(mGallery);
-                } else {
-                    mImageNotFound.setVisibility(View.VISIBLE);
-                }
+                displayVehicleImages(car);
 
 
                 mFab.setOnClickListener(new View.OnClickListener() {

@@ -7,24 +7,21 @@
     tools:context="com.ismaelDeka.vinscanner.ui.MainActivity">
 
 
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-
-            >
+            android:orientation="vertical">
 
             <ListView
                 android:id="@+id/car_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="9dp"
-            >
+                android:padding="9dp"/>
 
-        </ListView>
         </LinearLayout>
         <LinearLayout
             android:id="@+id/empty_state"

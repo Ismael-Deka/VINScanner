@@ -25,7 +25,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.ismaelDeka.vinscanner.ui.MainActivity.LOG_TAG;
 
@@ -290,7 +291,52 @@ public class QueryUtils {
             return null;
         }
 
+        Document doc = getDocument(make,model,year,trim);
+
+        ArrayList<String> imageUrls = new ArrayList<>();
+
+        String galleryUrl;
+
+        Pattern galleryPattern = Pattern.compile("https://www.cstatic-images.com/stock/900x600/[a-zA-Z0-9]*.jpg");
+        Matcher galleryMatcher = galleryPattern.matcher(doc.toString());
+
+        while (galleryMatcher.find()) {
+            galleryUrl = galleryMatcher.group();
+            if(galleryUrl != null)
+                imageUrls.add(galleryUrl);
+        }
+
+        if(imageUrls.size()==0){
+            Pattern portraitPattern = Pattern.compile("https://www.cstatic-images.com/car-pictures/maxWidth503/[a-zA-Z0-9]*.png");
+            Matcher portraitMatcher = portraitPattern.matcher(doc.toString());
+            if(portraitMatcher.find()){
+                imageUrls.add(portraitMatcher.group());
+            }
+        }
+
+        if(imageUrls.size()==0){
+            return null;
+        }
+
+        //MSRP stands for manufacturer's suggested retail price
+        Elements msrp = doc.getElementsByClass("mmy-header__msrp");
+        if(!msrp.isEmpty()) {
+            String price = msrp.get(0).toString();
+            price = price.replace("<div class=\"mmy-header__msrp\">", "");
+            price = price.replace("<b>Inventory Prices</b> \n</div>", "");
+            price = price.replace(" ","");
+            Log.e(LOG_TAG, price);
+            MSRP = price;
+        }
+
+
+
+        return getImages(imageUrls);
+    }
+
+    private static Document getDocument(String make, String model, String year,String trim){
         Document doc = null;
+
         try {
             model=model.replace(" ","_");
             model=model.replace("-","_");
@@ -328,69 +374,30 @@ public class QueryUtils {
             return null;
         }
 
-        Elements element;
-        String galleryUrls;
-        ArrayList<String> imageUrls = new ArrayList<>();
+        return doc;
 
-        //A string array of Image Urls are contained in this element as attributes
-        element= doc.getElementsByClass("cui-button banilla-lightbox-launch");
-        if(!element.isEmpty()) {
-            galleryUrls = element.attr("data-banilla-lightbox-content");
+    }
 
 
-            if (galleryUrls.isEmpty()) {
-                element = doc.getElementsByAttributeValueContaining("class", "slide nonDraggableImage");
-                imageUrls.add(element.first().attr("src"));
-            } else {
-                galleryUrls = galleryUrls.replace("{\"photos\":[{\"isPhoto\":true,\"index\":0,\"url\":\"", "");
-                galleryUrls = galleryUrls.replace(",{\"position\":3,\"size\":\"cube\",\"slot\":\"6427/buy.research/ymm.photo.iab\"}", "");
-                galleryUrls = galleryUrls.replace("\"},{\"isPhoto\":true,\"index\"", ",");
-                galleryUrls = galleryUrls.replaceAll(",:\\d,", ";;;;");
-                galleryUrls = galleryUrls.replaceAll(",:\\d\\d,", ";;;;");
-                galleryUrls = galleryUrls.replace("\"url\":\"", "");
-                galleryUrls = galleryUrls.replace("\"}],\"photoCount\":17,\"videoCount\":1,\"videos\":[23003834001],\"sponsoredVideos\":[],\"brightcovePlayerId\":\"SkW2Puhzg\",\"sponsoredBrightcovePlayerId\":\"rkUxc2xfx\"}", "");
 
-                String[] urls = galleryUrls.split(";;;;");
-                Log.e(LOG_TAG, urls.toString());
-                //Differentiate methods of extracting URLs for one or more images
-                if (urls.length > 1) {
-                    Collections.addAll(imageUrls, urls);
-                } else {
-                    galleryUrls = galleryUrls.replace("[\"", "").replace("\"]", "");
-                    imageUrls.add(galleryUrls);
-                }
-
-            }
-        }else {
-            return null;//If no picture can be found.
-        }
-        //MSRP stands for manufacturer's suggested retail price
-        Elements msrp = doc.getElementsByClass("mmy-header__msrp");
-        if(!msrp.isEmpty()) {
-            String price = msrp.get(0).toString();
-            price = price.replace("<div class=\"mmy-header__msrp\">", "");
-            price = price.replace("<b>Inventory Prices</b> \n</div>", "");
-            price = price.replace(" ","");
-            Log.e(LOG_TAG, price);
-            MSRP = price;
-        }
-
+    private static Bitmap[] getImages(ArrayList<String> urls){
         Bitmap[] carImages;
-        if(imageUrls.size()>8){//Limits the number of vehicle images to be downloaded to 8.
+        if(urls.size()>8){//Limits the number of vehicle images to be downloaded to 8.
             carImages = new Bitmap[8];
         }else {
-            carImages = new Bitmap[imageUrls.size()];
+            carImages = new Bitmap[urls.size()];
         }
         for(int i = 0; i < carImages.length; i++)
-        try {
-            InputStream inputStream = createUrl(imageUrls.get(i)).openStream();
-            carImages[i] =BitmapFactory.decodeStream(inputStream);
-            inputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            try {
+                InputStream inputStream = createUrl(urls.get(i)).openStream();
+                carImages[i] =BitmapFactory.decodeStream(inputStream);
+                inputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-        return carImages;
+            return carImages;
+
     }
 
 

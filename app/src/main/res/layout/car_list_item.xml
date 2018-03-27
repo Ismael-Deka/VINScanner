@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Layout for a single list item in the list of pets -->
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -9,8 +8,8 @@
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/list_logo"
         android:layout_toEndOf="@+id/car_list_delete_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
         android:layout_margin="8dp"
         />
     <LinearLayout

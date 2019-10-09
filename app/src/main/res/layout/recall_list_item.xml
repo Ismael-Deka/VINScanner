@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:padding="16dp">
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:id="@+id/recall_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -76,5 +76,5 @@
                 android:layout_alignParentRight="true"
                 android:padding="8dp"/>
     </RelativeLayout>
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 </LinearLayout>

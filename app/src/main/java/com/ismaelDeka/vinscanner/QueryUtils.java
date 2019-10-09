@@ -212,7 +212,7 @@ public class QueryUtils {
                     make = value;
                     break;
                 case "Model":
-                    model = value;
+                    model = formatEdgeCaseModel(value);
                     break;
                 case "Model Year":
                     year = value;
@@ -293,6 +293,10 @@ public class QueryUtils {
 
         Document doc = getDocument(make,model,year,trim);
 
+        if(doc == null){
+            return null;
+        }
+
         ArrayList<String> imageUrls = new ArrayList<>();
 
         String galleryUrl;
@@ -363,6 +367,7 @@ public class QueryUtils {
                 //Some Model on Cars.com required the trim as well as the model.
                 //This statement includes the trim in the request.
                 doc = Jsoup.connect(CARS_DOT_COM_URL_BASE+make.toLowerCase()+"-"+model.toLowerCase()+"_"+trim+"-"+year).get();
+                Log.e(LOG_TAG,CARS_DOT_COM_URL_BASE+make.toLowerCase()+"-"+model.toLowerCase()+"_"+trim+"-"+year);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -378,6 +383,16 @@ public class QueryUtils {
 
     }
 
+    private static String formatEdgeCaseModel(String model){
+
+        if(model.equals("Corolla Matrix")){
+            return "Matrix";
+        }else{
+            return model;
+        }
+
+
+    }
 
 
     private static Bitmap[] getImages(ArrayList<String> urls){

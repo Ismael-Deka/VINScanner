@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: com.google.firebase:firebase-storage:12.0.1@aar">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/25b23fddd80ffacad1b3d2b35fafc93f/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/25b23fddd80ffacad1b3d2b35fafc93f/jars/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

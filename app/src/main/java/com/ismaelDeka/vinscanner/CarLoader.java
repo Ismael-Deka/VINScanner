@@ -1,7 +1,7 @@
 package com.ismaelDeka.vinscanner;
 
 import android.app.Activity;
-import android.support.v4.content.AsyncTaskLoader;
+import androidx.loader.content.AsyncTaskLoader;
 import android.util.Log;
 
 import com.ismaelDeka.vinscanner.car.Car;

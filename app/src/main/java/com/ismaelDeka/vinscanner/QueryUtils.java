@@ -190,7 +190,7 @@ public class QueryUtils {
     }
 
     private static Car getCarInfo(String jsonResponse) throws JSONException {
-        int errorCode = -1;
+        String errorCode = "";
         String make = "";
         String model = "";
         String year = "";
@@ -207,7 +207,7 @@ public class QueryUtils {
             String value = reader.getString("Value");
             switch (variable) {
                 case "Error Code":
-                    errorCode = Integer.parseInt(reader.getString("ValueId"));
+                    errorCode = reader.getString("ValueId");
                 case "Make":
                     make = value;
                     break;
@@ -286,8 +286,8 @@ public class QueryUtils {
         return output.toString();
     }
 
-    private static Bitmap[] getCarImage(String make, String model, String year, String trim,int errorCode){
-        if(errorCode != 0){
+    private static Bitmap[] getCarImage(String make, String model, String year, String trim, String errorCode){
+        if(!errorCode.equals("0")){
             return null;
         }
 

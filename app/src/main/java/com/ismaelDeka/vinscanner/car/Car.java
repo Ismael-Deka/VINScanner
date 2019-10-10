@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class Car {
 
-    private int mErrorCode;
+    private String mErrorCode;
     private String mVin;
     private String mMake;
     private String mModel;
@@ -35,7 +35,7 @@ public class Car {
         mComplaints = null;
     }
 
-    public Car (int newErrorCode, String newMake,String newModel, String newTrim, String newYear,ArrayList<CarAttribute> newAttributes){
+    public Car (String newErrorCode, String newMake,String newModel, String newTrim, String newYear,ArrayList<CarAttribute> newAttributes){
         mErrorCode = newErrorCode;
         if(newMake != null) {
             mMake = newMake.substring(0, 1) + newMake.substring(1).toLowerCase();
@@ -48,7 +48,7 @@ public class Car {
     }
 
 
-    public Car(int newErrorCode, String newMake,String newModel, String newTrim, String newYear, String newVin,Bitmap[] newImage,
+    public Car(String newErrorCode, String newMake,String newModel, String newTrim, String newYear, String newVin,Bitmap[] newImage,
                ArrayList<CarAttribute> newAttributes,ArrayList<RecallAttribute> newRecallAttribute,
                ArrayList<CarComplaintAttribute> newComplaints, Bitmap newLogo,String newMarketPrice){
 
@@ -83,7 +83,7 @@ public class Car {
         return mMarketPrice;
     }
 
-    public int getErrorCode() {
+    public String getErrorCode() {
         return mErrorCode;
     }
 

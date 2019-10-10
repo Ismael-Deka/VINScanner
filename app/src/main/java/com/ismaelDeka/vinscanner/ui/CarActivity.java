@@ -222,9 +222,9 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
 
 
     }
-    private boolean validateVin(int errorCode){
+    private boolean validateVin(String errorCode){
 
-        if(errorCode != 0){
+        if(!errorCode.equals("0")){
             Toast toast = Toast.makeText(this, "Invalid VIN.", Toast.LENGTH_LONG);
             toast.show();
             startActivity(getParentActivityIntent());

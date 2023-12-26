@@ -18,7 +18,6 @@ public class Car {
     private String mTrim;
     private String mMarketPrice;
     private Bitmap mLogo;
-    private Bitmap mCarImage[];
     private ArrayList<CarAttribute> mInfo;
     private ArrayList<RecallAttribute> mRecallInfo;
     private ArrayList<CarComplaintAttribute> mComplaints;
@@ -38,7 +37,7 @@ public class Car {
     public Car (String newErrorCode, String newMake,String newModel, String newTrim, String newYear,ArrayList<CarAttribute> newAttributes){
         mErrorCode = newErrorCode;
         if(newMake != null) {
-            mMake = newMake.substring(0, 1) + newMake.substring(1).toLowerCase();
+            mMake = newMake.charAt(0) + newMake.substring(1).toLowerCase();
         }
         mModel = newModel;
         mTrim = newTrim;
@@ -48,13 +47,13 @@ public class Car {
     }
 
 
-    public Car(String newErrorCode, String newMake,String newModel, String newTrim, String newYear, String newVin,Bitmap[] newImage,
+    public Car(String newErrorCode, String newMake,String newModel, String newTrim, String newYear, String newVin,
                ArrayList<CarAttribute> newAttributes,ArrayList<RecallAttribute> newRecallAttribute,
                ArrayList<CarComplaintAttribute> newComplaints, Bitmap newLogo,String newMarketPrice){
 
         mErrorCode = newErrorCode;
         if(newMake != null) {
-            mMake = newMake.substring(0, 1) + newMake.substring(1).toLowerCase();
+            mMake = newMake.charAt(0) + newMake.substring(1).toLowerCase();
         }
         mModel = newModel;
         mTrim = newTrim;
@@ -62,7 +61,6 @@ public class Car {
         mLogo = newLogo;
         mVin = newVin;
         mInfo = newAttributes;
-        mCarImage = newImage;
         mRecallInfo = newRecallAttribute;
         mMarketPrice = newMarketPrice;
         mComplaints = newComplaints;
@@ -71,11 +69,7 @@ public class Car {
     }
 
     public boolean isCarInfoAvailable(){
-        if(mModel == null || mRecallInfo == null || mComplaints == null){
-            return false;
-        }else {
-            return true;
-        }
+        return mModel != null && mRecallInfo != null && mComplaints != null;
     }
 
 
@@ -108,10 +102,6 @@ public class Car {
 
     public String getVin() {
         return mVin;
-    }
-
-    public Bitmap[] getCarImages() {
-        return mCarImage;
     }
 
     public ArrayList<CarAttribute> getAttributes() {

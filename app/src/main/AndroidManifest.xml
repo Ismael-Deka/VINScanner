@@ -39,8 +39,7 @@
         <activity
             android:name="com.ismaelDeka.vinscanner.ui.CarActivity"
             android:parentActivityName="com.ismaelDeka.vinscanner.ui.MainActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:screenOrientation="portrait" />
         <provider
             android:authorities="com.ismaelDeka.vinscanner"
             android:name="com.ismaelDeka.vinscanner.db.CarProvider"

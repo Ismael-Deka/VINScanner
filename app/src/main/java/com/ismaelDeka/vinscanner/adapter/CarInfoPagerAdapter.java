@@ -1,5 +1,6 @@
 package com.ismaelDeka.vinscanner.adapter;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
@@ -16,8 +17,7 @@ import com.ismaelDeka.vinscanner.ui.CarRecallFragment;
 public class CarInfoPagerAdapter extends FragmentPagerAdapter {
 
     private Car mCar;
-    private int mTotalFragments = 3;
-    private String tabTitles[] = new String[] { "General", "Recalls", "Complaints"};
+    private final String[] tabTitles = new String[] { "General", "Recalls", "Complaints"};
 
     public CarInfoPagerAdapter(FragmentManager manager){
         super(manager);
@@ -28,6 +28,7 @@ public class CarInfoPagerAdapter extends FragmentPagerAdapter {
         this.mCar = car;
     }
 
+    @NonNull
     @Override
     public Fragment getItem(int position) {
         switch (position) {

@@ -1,5 +1,7 @@
 package com.ismaelDeka.vinscanner.ui;
 
+import static com.ismaelDeka.vinscanner.R.id.fab;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -11,26 +13,24 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import com.google.android.material.appbar.AppBarLayout;
-import com.google.android.material.appbar.CollapsingToolbarLayout;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.tabs.TabLayout;
-import androidx.loader.app.LoaderManager;
-import androidx.loader.content.Loader;
-import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.Loader;
+import androidx.viewpager.widget.ViewPager;
+
 import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.tabs.TabLayout;
 import com.ismaelDeka.vinscanner.CarLoader;
 import com.ismaelDeka.vinscanner.R;
-import com.ismaelDeka.vinscanner.adapter.CarImagePagerAdapter;
 import com.ismaelDeka.vinscanner.adapter.CarInfoPagerAdapter;
 import com.ismaelDeka.vinscanner.car.Car;
 import com.ismaelDeka.vinscanner.db.CarContract;
@@ -38,26 +38,22 @@ import com.ismaelDeka.vinscanner.db.CarContract;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
-import static com.ismaelDeka.vinscanner.R.id.fab;
-import static com.ismaelDeka.vinscanner.R.id.toolbar;
+import java.util.Objects;
 
 public class CarActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Car>{
 
     private Uri mUri;
     private Car mCar;
-    private CollapsingToolbarLayout mToolbarLayout;
+
     private String mVin;
-    private TabLayout mTabDots;
+
     private TabLayout mTabs;
     private ViewPager mViewPager;
-    private ViewPager mGallery;
-    private AppBarLayout mAppBarLayout;
+
     private ProgressBar mProgressBar;
     private FloatingActionButton mFab;
     private LinearLayout mNoInternetView;
-    private ImageView mImageNotFound;
-    private ImageButton mReloadButton;
+
     private boolean mIsVehicleSaved;
 
     @Override
@@ -65,25 +61,21 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_car);
 
-        Toolbar mToolbar = (Toolbar) findViewById(toolbar);
-        setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-
-        mToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
-        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
-        mAppBarLayout = (AppBarLayout) findViewById(R.id.app_bar_layout);
-        mGallery = (ViewPager) findViewById(R.id.gallery);
-        mTabDots = (TabLayout) findViewById(R.id.tabDots);
-        mFab = (FloatingActionButton) findViewById(fab);
-        mTabs = (TabLayout) findViewById(R.id.sliding_tabs);
-        mViewPager = (ViewPager) findViewById(R.id.viewpager);
-        mImageNotFound = (ImageView)findViewById(R.id.image_not_found);
-        mReloadButton = (ImageButton) findViewById(R.id.reload_button);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
 
 
-        mNoInternetView = (LinearLayout) findViewById(R.id.empty_state);
+        mProgressBar = findViewById(R.id.progressBar);
+
+        mFab = findViewById(fab);
+        mTabs = findViewById(R.id.sliding_tabs);
+        mViewPager = findViewById(R.id.viewpager);
+
+        ImageButton mReloadButton = findViewById(R.id.reload_button);
+
+
+
+        mNoInternetView = findViewById(R.id.empty_state);
 
 
         mProgressBar.setVisibility(View.VISIBLE);
@@ -116,9 +108,6 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
 
         mIsVehicleSaved = isVehicleSaved();
 
-
-
-        mAppBarLayout.setExpanded(false,false);
 
 
 
@@ -170,29 +159,30 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
             mUri = newUri;
         }
     }
-    private String saveCarLogo(){
+    private void saveCarLogo(){
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
 
         File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
-        File mypath=new File(directory,mCar.getMake()+".jpg");
+        File myPath=new File(directory,mCar.getMake()+".jpg");
 
         Bitmap bmp = mCar.getLogo();
 
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(mypath);
+            fos = new FileOutputStream(myPath);
             // Use the compress method on the BitMap object to write image to the OutputStream
             bmp.compress(Bitmap.CompressFormat.PNG, 100, fos);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             try {
+                assert fos != null;
                 fos.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        return directory.getAbsolutePath();
+
     }
 
     private void deleteCar(Uri uri) {
@@ -203,13 +193,15 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
             int rowsDeleted = getContentResolver().delete(uri, null, null);
 
             File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
-            File mypath=new File(directory,mCar.getMake()+".jpg");
-            mypath.delete();
+            File myPath=new File(directory,mCar.getMake()+".jpg");
+            boolean delete = myPath.delete();
 
             if (rowsDeleted == 0) {
                 Toast.makeText(this, "Failed to Delete Vehicle",
                         Toast.LENGTH_SHORT).show();
-            } else {
+            } else if(delete) {
+                Log.e("CarActivity", "Failed to Delete Vehicle Logo");
+            }else {
                 Intent intent = new Intent();
                 intent.putExtra("make",mCar.getMake());
                 intent.putExtra("model",mCar.getModel());
@@ -241,7 +233,7 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
         finish();
     }
 
-    private void displayVehicleImages(Car car){
+    private void displayVehicle(Car car){
         CarInfoPagerAdapter carInfoPagerAdapter = new CarInfoPagerAdapter(getSupportFragmentManager());
         carInfoPagerAdapter.setCar(car);
         mViewPager.setAdapter(carInfoPagerAdapter);
@@ -249,28 +241,18 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
         mTabs.setSelectedTabIndicatorColor(Color.WHITE);
         mTabs.setupWithViewPager(mViewPager);
 
-        mToolbarLayout.setTitle(car.getYear() + " " + car.getMake() + " " + car.getModel());
-
-        if (car.getCarImages() != null) {
-            Bitmap[] galleryImages = car.getCarImages();
-            CarImagePagerAdapter carImageAdapter = new CarImagePagerAdapter(CarActivity.this, galleryImages);
-            mAppBarLayout.setExpanded(true, true);
-            mGallery.setAdapter(carImageAdapter);
-            if (galleryImages.length > 1)
-                mTabDots.setupWithViewPager(mGallery);
-        } else {
-            mImageNotFound.setVisibility(View.VISIBLE);
-        }
+       Objects.requireNonNull(getSupportActionBar()).setTitle(car.getYear() + " " + car.getMake() + " " + car.getModel());
 
     }
 
+    @NonNull
     @Override
     public Loader<Car> onCreateLoader(int i, Bundle bundle) {
         return new CarLoader(this,mVin);
     }
 
     @Override
-    public void onLoadFinished(Loader<Car> loader, Car car) {
+    public void onLoadFinished(@NonNull Loader<Car> loader, Car car) {
 
         if(car == null){
             exitFailedActivity();
@@ -295,7 +277,7 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
                 }
                 mViewPager.setVisibility(View.VISIBLE);
 
-                displayVehicleImages(car);
+                displayVehicle(car);
 
 
                 mFab.setOnClickListener(new View.OnClickListener() {
@@ -325,7 +307,7 @@ public class CarActivity extends AppCompatActivity implements LoaderManager.Load
     }
 
     @Override
-    public void onLoaderReset(Loader<Car> loader) {
+    public void onLoaderReset(@NonNull Loader<Car> loader) {
 
     }
 

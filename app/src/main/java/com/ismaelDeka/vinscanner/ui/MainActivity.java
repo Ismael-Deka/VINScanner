@@ -6,7 +6,6 @@ import android.app.LoaderManager;
 import android.app.SearchManager;
 import android.content.ContentUris;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,15 +16,6 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -39,15 +29,23 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.barcode.Barcode;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.ismaelDeka.vinscanner.R;
 import com.ismaelDeka.vinscanner.adapter.CarCursorAdapter;
 import com.ismaelDeka.vinscanner.db.CarContract;
 
-import java.io.File;
-
-;
+import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity implements  LoaderManager.LoaderCallbacks<Cursor>
                                                             ,SearchView.OnQueryTextListener {
@@ -57,8 +55,6 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
     private static final int PERMISSIONS_REQUEST_CAPTURE_IMAGE = 1;
 
     private SearchView mSearchView;
-
-    private MenuItem mSearchMenuItem;
 
     private CarCursorAdapter mAdapter;
 
@@ -81,15 +77,15 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FloatingActionButton scanButton = (FloatingActionButton) findViewById(R.id.scan_button);
-        mCarList = (ListView) findViewById(R.id.car_list);
+        FloatingActionButton scanButton = findViewById(R.id.scan_button);
+        mCarList = findViewById(R.id.car_list);
 
 
         mAdapter = new CarCursorAdapter(this,null);
 
         mCarList.setAdapter(mAdapter);
 
-        mEmptyState = (LinearLayout) findViewById(R.id.empty_state);
+        mEmptyState = findViewById(R.id.empty_state);
         mCarList.setEmptyView(mEmptyState);
 
 
@@ -115,11 +111,6 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
                         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                switch (which){
-                                    case DialogInterface.BUTTON_POSITIVE:
-                                        break;
-
-                                }
                             }
                         };
                         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -137,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
         mCarList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TextView vinTextView = (TextView)view.findViewById(R.id.car_vin);
+                TextView vinTextView = view.findViewById(R.id.car_vin);
                 mVin = vinTextView.getText().toString();
 
                 Uri uri = ContentUris.withAppendedId(CarContract.CarEntry.CONTENT_URI, id);
@@ -162,7 +153,8 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
 }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
         outState.putBoolean("deleteState", mDeleteVehicleState);
 
     }
@@ -171,6 +163,7 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
     private void setDeleteVehicleState(){
         mDeleteButton.setVisible(false);
         ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle("Delete Vehicles");
@@ -183,6 +176,7 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
         mDeleteVehicleState = false;
         ActionBar actionBar = getSupportActionBar();
         mDeleteButton.setVisible(true);
+        assert actionBar != null;
         actionBar.setHomeButtonEnabled(false);
         actionBar.setDisplayHomeAsUpEnabled(false);
         actionBar.setTitle(getResources().getString(R.string.app_name));
@@ -193,32 +187,20 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
     }
 
 
-
-    private void deleteCarLogo(String make) {
-        ContextWrapper cw = new ContextWrapper(getApplicationContext());
-
-        File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
-        File mypath = new File(directory, make + ".jpg");
-        mypath.delete();
-    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_CAPTURE_IMAGE: {
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted
+        if (requestCode == PERMISSIONS_REQUEST_CAPTURE_IMAGE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // permission was granted
 
-                    Intent cameraIntent = new Intent(MainActivity.this,VinScannerActivity.class);
-                    startActivityForResult(cameraIntent, 1888);
+                Intent cameraIntent = new Intent(MainActivity.this, VinScannerActivity.class);
+                startActivityForResult(cameraIntent, 1888);
 
 
-                } else {
-                    // permission denied
+            } else {
+                // permission denied
 
-                    Log.d("", "permission denied");
-                }
-                return;
+                Log.d("", "permission denied");
             }
         }
     }
@@ -230,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
 
         SearchManager searchManager = (SearchManager)
                 getSystemService(Context.SEARCH_SERVICE);
-        mSearchMenuItem = menu.findItem(R.id.search);
+        MenuItem mSearchMenuItem = menu.findItem(R.id.search);
         mDeleteButton = menu.findItem(R.id.delete);
 
         mDeleteButton.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
@@ -284,51 +266,51 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
 
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                if(mDeleteVehicleState)
-                    restoreNormalState();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == android.R.id.home) {
+            if (mDeleteVehicleState)
+                restoreNormalState();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
 
     protected void onActivityResult(final int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == CommonStatusCodes.SUCCESS) {
             Barcode vinBarcode;
-            if(data != null) {
+            if (data != null) {
                 vinBarcode = data.getParcelableExtra("barcode");
+                assert vinBarcode != null;
                 mVin = vinBarcode.displayValue;
-                if(mVin.length()!=17){
+                if (mVin.length() != 17) {
                     mVin = vinBarcode.displayValue.substring(1);
                 }
-                startCarActivity(null,false);
+                startCarActivity(null, false);
             }
-        }else if(resultCode == RESULT_OK){
+        } else if (resultCode == RESULT_OK) {
             final String make = data.getStringExtra("make");
             final String model = data.getStringExtra("model");
             final String year = data.getStringExtra("year");
             final String vin = data.getStringExtra("vin");
-            Snackbar.make(mCarList,year+" "+make+ " "+model+" Deleted.", Snackbar.LENGTH_INDEFINITE).
+            Snackbar.make(mCarList, year + " " + make + " " + model + " Deleted.", Snackbar.LENGTH_INDEFINITE).
                     setAction("Undo", new View.OnClickListener() {
 
                         @Override
                         public void onClick(View v) {
                             mVin = vin;
-                            startCarActivity(null,true);
+                            startCarActivity(null, true);
                         }
 
                     }).show();
-        }else if(resultCode == CommonStatusCodes.NETWORK_ERROR){
+        } else if (resultCode == CommonStatusCodes.NETWORK_ERROR) {
             mVin = data.getStringExtra("vin_failed");
-            Snackbar.make(mCarList,"Failed to retrieve Vehicle Information.",Snackbar.LENGTH_INDEFINITE).
+            Snackbar.make(mCarList, "Failed to retrieve Vehicle Information.", Snackbar.LENGTH_INDEFINITE).
                     setAction("Retry", new View.OnClickListener() {
 
                         @Override
                         public void onClick(View v) {
-                            startCarActivity(null,false);
+                            startCarActivity(null, false);
                         }
 
                     }).show();
@@ -378,7 +360,7 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
         if(c != null){
             int vinIndex = c.getColumnIndex(CarContract.CarEntry.COLUMN_CAR_VIN);
             if(c.getCount()>0){
-                Log.e(LOG_TAG,vinIndex+"");
+
                 mVin = c.getString(vinIndex);
                 c.close();
                 startCarActivity(null,false);
@@ -442,7 +424,7 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
 
                 selection = CarContract.CarEntry.COLUMN_CAR_YEAR + " like '" +
                     query[0]+"%'" + " OR " + CarContract.CarEntry.COLUMN_CAR_MAKE + " like '% " + query[1] + " %'" + " OR " +
-                    CarContract.CarEntry.COLUMN_CAR_MODEL + " like '" + query + "%'";
+                    CarContract.CarEntry.COLUMN_CAR_MODEL + " like '" + Arrays.toString(query) + "%'";
             }else {
                 String[] query = str.split(" ");
 
@@ -468,7 +450,7 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
         String make = carName[1];
         String model = carName[2];
 
-        if (str == null ||  str.length () == 0)  {
+        if (str.length() == 0)  {
             mCursor = mAdapter.getCursor();
         }
         else {
@@ -477,10 +459,9 @@ public class MainActivity extends AppCompatActivity implements  LoaderManager.Lo
             String selection = CarContract.CarEntry.COLUMN_CAR_YEAR + " like '" +
                     year+"%'" + " AND " + CarContract.CarEntry.COLUMN_CAR_MAKE + " like '" + make + "%'" + " AND " +
                     CarContract.CarEntry.COLUMN_CAR_MODEL + " like '" + model + "%'";
-            String[] selectionArgs = null;
-            String sortOrder = null;
-            mCursor = getContentResolver().query(uri, projection, selection, selectionArgs,
-                    sortOrder);
+
+            mCursor = getContentResolver().query(uri, projection, selection, null,
+                    null);
         }
         if (mCursor != null) {
             mCursor.moveToFirst();

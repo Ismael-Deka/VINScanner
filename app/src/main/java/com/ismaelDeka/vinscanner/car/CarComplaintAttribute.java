@@ -6,15 +6,15 @@ package com.ismaelDeka.vinscanner.car;
 
 public class CarComplaintAttribute {
 
-    private String mODINumber;
-    private String mCrash;
-    private String mFire;
-    private int mNumberInjured;
-    private int mNumberDeaths;
-    private String mDateIncident;
-    private String mDateFiled;
-    private String mComponent;
-    private String mSummary;
+    private final String mODINumber;
+    private final String mCrash;
+    private final String mFire;
+    private final int mNumberInjured;
+    private final int mNumberDeaths;
+    private final String mDateIncident;
+    private final String mDateFiled;
+    private final String mComponent;
+    private final String mSummary;
 
     public CarComplaintAttribute(String odiNumber, String crash, String fire, int numberInjured,
                                  int numberDeaths, String dateIncident, String dateFiled, String component, String summary){
@@ -66,39 +66,4 @@ public class CarComplaintAttribute {
         return mSummary;
     }
 
-    public void setmComponent(String mComponent) {
-        this.mComponent = mComponent;
-    }
-
-    public void setCrash(String mCrash) {
-        this.mCrash = mCrash;
-    }
-
-    public void setDateFiled(String mDateFiled) {
-        this.mDateFiled = mDateFiled;
-    }
-
-    public void setDateIncident(String mDateIncident) {
-        this.mDateIncident = mDateIncident;
-    }
-
-    public void setFire(String mFire) {
-        this.mFire = mFire;
-    }
-
-    public void setNumberDeaths(int mNumberDeaths) {
-        this.mNumberDeaths = mNumberDeaths;
-    }
-
-    public void setNumberInjured(int mNumberInjured) {
-        this.mNumberInjured = mNumberInjured;
-    }
-
-    public void setODINumber(String mODINumber) {
-        this.mODINumber = mODINumber;
-    }
-
-    public void setSummary(String mSummary) {
-        this.mSummary = mSummary;
-    }
 }

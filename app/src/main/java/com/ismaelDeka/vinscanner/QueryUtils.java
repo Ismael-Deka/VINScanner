@@ -1,5 +1,7 @@
 package com.ismaelDeka.vinscanner;
 
+import static com.ismaelDeka.vinscanner.ui.MainActivity.LOG_TAG;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
@@ -12,9 +14,6 @@ import com.ismaelDeka.vinscanner.car.RecallAttribute;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,10 +24,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static com.ismaelDeka.vinscanner.ui.MainActivity.LOG_TAG;
 
 /**
  * Created by Ismael on 2/21/2017.
@@ -38,25 +33,19 @@ public class QueryUtils {
 
 
     private static final String NHTSA_VIN_DECODE_URL_BASE = "https://vpic.nhtsa.dot.gov/api/vehicles/decodevinextended/";
-    private static final String NHTSA_RECALL_URL_BASE = "https://one.nhtsa.gov/webapi/api/Recalls/vehicle/modelyear/";
-    private static final String NHASA_COMPLAINTS_URL_BASE = "https://one.nhtsa.gov/webapi/api/Complaints/vehicle/modelyear/";
-    private static final String CARS_DOT_COM_URL_BASE = "https://www.cars.com/research/";
+    private static final String NHTSA_RECALL_URL_BASE = "https://api.nhtsa.gov/recalls/recallsByVehicle?";
+    private static final String NHTSA_COMPLAINTS_URL_BASE = "https://api.nhtsa.gov/complaints/complaintsByVehicle?";
     private static final String NHTSA_VEHICLE_LOGO_BASE = "https://vpic.nhtsa.dot.gov/decoder/Images/Logos/";
-    private static boolean isTrimIncluded = false;
-    private static String MSRP = "Unavailable";
+
 
 
     public static Car extractCar(String vin) {
         Car decodedCar = new Car();
-        Bitmap[] carImages;
 
-
-    Log.e(LOG_TAG,vin);
         try {
 
             //Forming complete Url from Base Url, VIN number, and format parameter
             String vinUrl = NHTSA_VIN_DECODE_URL_BASE + vin + "?format=json";
-            Log.e(LOG_TAG,vin);
             String jsonResponse = makeHttpRequest(createUrl(vinUrl));
 
             if(jsonResponse == null){
@@ -68,17 +57,18 @@ public class QueryUtils {
             String complaintUrl;
             if(car.getModel().contains(" ")) {
                 String model = car.getModel().replace(" ", "");
-                recallUrl = NHTSA_RECALL_URL_BASE + car.getYear() + "/make/" + car.getMake() + "/model/"+model+"?format=json";
-                complaintUrl = NHASA_COMPLAINTS_URL_BASE + car.getYear() + "/make/" + car.getMake() + "/model/"+model+"?format=json";
-            }else {
-                recallUrl = NHTSA_RECALL_URL_BASE + car.getYear() + "/make/" + car.getMake() + "/model/"+car.getModel()+"?format=json";
-                complaintUrl = NHASA_COMPLAINTS_URL_BASE + car.getYear() + "/make/" + car.getMake() + "/model/"+car.getModel()+"?format=json";
+                recallUrl = NHTSA_RECALL_URL_BASE + "make=" + car.getMake() + "&model="+ model +"&modelYear="+car.getYear();
+                complaintUrl = NHTSA_COMPLAINTS_URL_BASE + "make=" + car.getMake() + "&model="+ model +"&modelYear="+car.getYear();
+            } else {
+                recallUrl = NHTSA_RECALL_URL_BASE + "make=" + car.getMake() + "&model="+ car.getModel() +"&modelYear="+car.getYear();
+                complaintUrl = NHTSA_COMPLAINTS_URL_BASE + "make=" + car.getMake() + "&model="+ car.getModel() +"&modelYear="+car.getYear();
             }
 
-            Log.e(LOG_TAG,recallUrl);
+
             jsonResponse = makeHttpRequest(createUrl(recallUrl));
 
             if(jsonResponse == null){
+
                 return new Car(vin);
             }
 
@@ -86,21 +76,12 @@ public class QueryUtils {
 
             jsonResponse = makeHttpRequest(createUrl(complaintUrl));
 
-            if(jsonResponse == null){
-                return new Car(vin);
-            }
-
             ArrayList<CarComplaintAttribute> complaints = getComplaints(jsonResponse);
 
-            carImages = getCarImage(car.getMake(),car.getModel(),car.getYear(),car.getTrim(),car.getErrorCode());
 
-            if(isTrimIncluded && !car.getTrim().equals("null"))
-                decodedCar = new Car(car.getErrorCode(),car.getMake(),car.getModel()+" "+car.getTrim(),car.getTrim(),car.getYear(),vin,
-                        carImages,car.getAttributes(),recallInfo,complaints,getCarLogo(car.getMake()),MSRP);
-            else {
-                decodedCar = new Car(car.getErrorCode(), car.getMake(), car.getModel(), car.getTrim(), car.getYear(), vin,
-                                    carImages, car.getAttributes(), recallInfo,complaints,getCarLogo(car.getMake()),MSRP);
-            }
+            decodedCar = new Car(car.getErrorCode(), car.getMake(), car.getModel(), car.getTrim(), car.getYear(), vin,
+                    car.getAttributes(), recallInfo,complaints,getCarLogo(car.getMake()),null);
+
 
 
     } catch (JSONException e) {
@@ -130,8 +111,13 @@ public class QueryUtils {
 
     private static ArrayList<RecallAttribute> getRecallInfo(String jsonResponse) throws JSONException {
         ArrayList<RecallAttribute> recallInfo = new ArrayList<>();
+
+        if(jsonResponse == null){
+            return recallInfo;
+        }
+
         JSONObject reader = new JSONObject(jsonResponse);
-        JSONArray arr = reader.getJSONArray("Results");
+        JSONArray arr = reader.getJSONArray("results");
         String campaignNumber;
         String component;
         String summary;
@@ -143,7 +129,7 @@ public class QueryUtils {
             campaignNumber = reader.getString("NHTSACampaignNumber");
             component = reader.getString("Component");
             summary = reader.getString("Summary");
-            consequence = reader.getString("Conequence");
+            consequence = reader.getString("Consequence");
             remedy = reader.getString("Remedy");
             date = reader.getString("ReportReceivedDate");
             recallInfo.add(new RecallAttribute(campaignNumber, component, summary, consequence, remedy, date));
@@ -155,8 +141,13 @@ public class QueryUtils {
 
     private static ArrayList<CarComplaintAttribute> getComplaints(String jsonResponse) throws JSONException {
         ArrayList<CarComplaintAttribute> complaints = new ArrayList<>();
+
+        if(jsonResponse == null){
+            return complaints;
+        }
+
         JSONObject reader = new JSONObject(jsonResponse);
-        JSONArray arr = reader.getJSONArray("Results");
+        JSONArray arr = reader.getJSONArray("results");
 
         String odiNumber;
         String crash;
@@ -168,24 +159,22 @@ public class QueryUtils {
         String component;
         String summary;
         for(int i = 0; i < arr.length();i++){
-            Log.e("Complaint",i+"");
             reader = arr.getJSONObject(i);
-            odiNumber = reader.getString("ODINumber");
-            component = reader.getString("Component");
-            summary = reader.getString("Summary");
-            numberDeaths= reader.getInt("NumberOfDeaths");
-            numberInjured= reader.getInt("NumberOfInjured");
-            if(reader.has("DateofIncident")) {
-                dateIncident = reader.getString("DateofIncident");
+            odiNumber = reader.getString("odiNumber");
+            component = reader.getString("components");
+            summary = reader.getString("summary");
+            numberDeaths= reader.getInt("numberOfDeaths");
+            numberInjured= reader.getInt("numberOfInjuries");
+            if(reader.has("dateOfIncident")) {
+                dateIncident = reader.getString("dateOfIncident");
             }
-            dateFiled = reader.getString("DateComplaintFiled");
-            crash =reader.getString("Crash");
-            fire = reader.getString("Fire");
+            dateFiled = reader.getString("dateComplaintFiled");
+            crash =reader.getString("crash");
+            fire = reader.getString("fire");
             complaints.add(new CarComplaintAttribute(odiNumber,crash,fire,numberInjured,numberDeaths,
                                                     dateIncident,dateFiled,component,summary));
 
         }
-
         return complaints;
     }
 
@@ -212,7 +201,7 @@ public class QueryUtils {
                     make = value;
                     break;
                 case "Model":
-                    model = formatEdgeCaseModel(value);
+                    model = value;
                     break;
                 case "Model Year":
                     year = value;
@@ -257,6 +246,7 @@ public class QueryUtils {
                 response = readFromStream(inputStream);
 
             } else {
+                Log.e(LOG_TAG, "URL: " + url);
                 Log.e(LOG_TAG, "Error response code: " + urlConnection.getResponseCode());
             }
         } catch (IOException e) {
@@ -286,141 +276,11 @@ public class QueryUtils {
         return output.toString();
     }
 
-    private static Bitmap[] getCarImage(String make, String model, String year, String trim, String errorCode){
-        if(!errorCode.equals("0")){
-            return null;
-        }
-
-        Document doc = getDocument(make,model,year,trim);
-
-        if(doc == null){
-            return null;
-        }
-
-        ArrayList<String> imageUrls = new ArrayList<>();
-
-        String galleryUrl;
-
-        Pattern galleryPattern = Pattern.compile("https://www.cstatic-images.com/stock/900x600/[a-zA-Z0-9]*.jpg");
-        Matcher galleryMatcher = galleryPattern.matcher(doc.toString());
-
-        while (galleryMatcher.find()) {
-            galleryUrl = galleryMatcher.group();
-            if(galleryUrl != null)
-                imageUrls.add(galleryUrl);
-        }
-
-        if(imageUrls.size()==0){
-            Pattern portraitPattern = Pattern.compile("https://www.cstatic-images.com/car-pictures/maxWidth503/[a-zA-Z0-9]*.png");
-            Matcher portraitMatcher = portraitPattern.matcher(doc.toString());
-            if(portraitMatcher.find()){
-                imageUrls.add(portraitMatcher.group());
-            }
-        }
-
-        if(imageUrls.size()==0){
-            return null;
-        }
-
-        //MSRP stands for manufacturer's suggested retail price
-        Elements msrp = doc.getElementsByClass("mmy-header__msrp");
-        if(!msrp.isEmpty()) {
-            String price = msrp.get(0).toString();
-            price = price.replace("<div class=\"mmy-header__msrp\">", "");
-            price = price.replace("<b>Inventory Prices</b> \n</div>", "");
-            price = price.replace(" ","");
-            Log.e(LOG_TAG, price);
-            MSRP = price;
-        }
-
-
-
-        return getImages(imageUrls);
-    }
-
-    private static Document getDocument(String make, String model, String year,String trim){
-        Document doc = null;
-
-        try {
-            model=model.replace(" ","_");
-            model=model.replace("-","_");
-            model=model.replace("&","and");
-
-            doc = Jsoup.connect(CARS_DOT_COM_URL_BASE+make+"-"+model+"-"+year).get();
-            Log.e(LOG_TAG,CARS_DOT_COM_URL_BASE+make+"-"+model+"-"+year);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if(doc == null){
-            try {
-                //Some Models in the NHTSA Database have space in between certain phases(i.e. MITSUBISHI 3000 GT instead of 3000GT)
-                //This is to correct for those differences
-                doc = Jsoup.connect(CARS_DOT_COM_URL_BASE+make+"-"+model.replace("_","")+"-"+year).get();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Log.e(LOG_TAG,CARS_DOT_COM_URL_BASE+make+"-"+model.replace("_","")+"-"+year);
-        }
-        if(doc == null){
-            try {
-                //Some Model on Cars.com required the trim as well as the model.
-                //This statement includes the trim in the request.
-                doc = Jsoup.connect(CARS_DOT_COM_URL_BASE+make.toLowerCase()+"-"+model.toLowerCase()+"_"+trim+"-"+year).get();
-                Log.e(LOG_TAG,CARS_DOT_COM_URL_BASE+make.toLowerCase()+"-"+model.toLowerCase()+"_"+trim+"-"+year);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Log.e(LOG_TAG,CARS_DOT_COM_URL_BASE+make.toLowerCase()+"-"+model.toLowerCase()+"_"+trim+"-"+year);
-            isTrimIncluded = true;
-        }
-        if (doc == null){
-            //if all other query methods fail.
-            return null;
-        }
-
-        return doc;
-
-    }
-
-    private static String formatEdgeCaseModel(String model){
-
-        if(model.equals("Corolla Matrix")){
-            return "Matrix";
-        }else{
-            return model;
-        }
-
-
-    }
-
-
-    private static Bitmap[] getImages(ArrayList<String> urls){
-        Bitmap[] carImages;
-        if(urls.size()>8){//Limits the number of vehicle images to be downloaded to 8.
-            carImages = new Bitmap[8];
-        }else {
-            carImages = new Bitmap[urls.size()];
-        }
-        for(int i = 0; i < carImages.length; i++)
-            try {
-                InputStream inputStream = createUrl(urls.get(i)).openStream();
-                carImages[i] =BitmapFactory.decodeStream(inputStream);
-                inputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return carImages;
-
-    }
-
-
 
 
     public static Bitmap getCarLogo(String make){
         Bitmap logo = null;
-        Log.e(LOG_TAG,NHTSA_VEHICLE_LOGO_BASE+make+".jpg");
+
         try {
             InputStream inputStream = createUrl(NHTSA_VEHICLE_LOGO_BASE+make+".jpg").openStream();
             logo =BitmapFactory.decodeStream(inputStream);
@@ -428,7 +288,7 @@ public class QueryUtils {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Log.e(LOG_TAG,(logo == null)+"");
+
         return logo;
     }
 }

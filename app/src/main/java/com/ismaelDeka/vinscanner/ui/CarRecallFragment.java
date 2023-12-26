@@ -1,6 +1,8 @@
 package com.ismaelDeka.vinscanner.ui;
 
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -29,8 +31,8 @@ public class CarRecallFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_car_recall, container, false);
 
-        RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.recall_list);
-        TextView emptyState = (TextView) rootView.findViewById(R.id.empty_state);
+        RecyclerView recyclerView = rootView.findViewById(R.id.recall_list);
+        TextView emptyState = rootView.findViewById(R.id.empty_state);
 
 
         if(savedInstanceState == null) {
@@ -48,27 +50,11 @@ public class CarRecallFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
 
-
-        /*TextView description = (TextView) rootView.findViewById(R.id.description);
-
-        ArrayList<RecallAttribute> recallInfo = mCar.getRecallInfo();
-        String key;
-        String value;
-
-        for(int i = 0; i < recallInfo.size(); i++){
-            key = recallInfo.get(i).getComponent();
-            value = recallInfo.get(i).getSummary();
-            description.setText(description.getText()+key+": "+value+"\n"+"\n");
-        }*/
-
-
-
-
         return rootView;
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
 
         ArrayList<RecallAttribute> attributes = mCar.getRecallInfo();
         for(int i = 0; i < attributes.size(); i++){
@@ -86,7 +72,7 @@ public class CarRecallFragment extends Fragment {
         int size = b.getInt("attrSize");
         ArrayList<RecallAttribute> attributes = new ArrayList<>();
         for(int i = 0; i < size; i++){
-            attributes.add(new RecallAttribute(b.getString("campaign"+i),b.getString("componant"+i),b.getString("summary"+i),
+            attributes.add(new RecallAttribute(b.getString("campaign"+i),b.getString("component"+i),b.getString("summary"+i),
                                             b.getString("consequence"+i),b.getString("remedy"+i),b.getString("date+i")));
         }
 

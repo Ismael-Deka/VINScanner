@@ -1,14 +1,14 @@
 package com.ismaelDeka.vinscanner;
 
+import static android.content.Context.VIBRATOR_SERVICE;
+
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.os.Vibrator;
-import android.util.Log;
 import android.util.SparseArray;
 import android.widget.Toast;
 
@@ -18,16 +18,12 @@ import com.google.android.gms.vision.barcode.BarcodeDetector;
 
 import java.io.ByteArrayOutputStream;
 
-import static android.content.Context.VIBRATOR_SERVICE;
-import static com.google.android.gms.wearable.DataMap.TAG;
-
 /**
  * Created by Ismael on 3/16/2017.
  */
 
-@SuppressWarnings("deprecation")
 public class VinScanner implements Camera.PreviewCallback {
-    private Context mContext;
+    private final Context mContext;
     private boolean mIsVibrateOnce = false;
     private OnVinFoundListener mCallback;
 
@@ -59,7 +55,6 @@ public class VinScanner implements Camera.PreviewCallback {
         BarcodeDetector detector = new BarcodeDetector.Builder(mContext).setBarcodeFormats(Barcode.CODE_39).build();
         SparseArray<Barcode> barcodes = detector.detect(frame);
         if(barcodes.size() > 0) {
-            Intent i = new Intent();
             Barcode barcode = barcodes.valueAt(0);
             String vin;
             if(barcode.displayValue.length() > 17)
@@ -67,11 +62,12 @@ public class VinScanner implements Camera.PreviewCallback {
             else
                 vin = barcode.displayValue;
 
-            if(vin.matches("[a-zA-Z0-9]*")) {
-                if(!mIsVibrateOnce)
-                    Toast.makeText(mContext, "VIN: " + vin, Toast.LENGTH_SHORT).show();
+            if(vin.matches("[a-zA-Z\\d]*")) {
+                if(!mIsVibrateOnce) {
+                    Toast.makeText(mContext, "VIN: " + vin, Toast.LENGTH_LONG).show();
                     vibrate();
-                Log.e(TAG, "Barcode Found.");
+                    mIsVibrateOnce = true;
+                }
                 mCallback.onVinFound(barcode);
             }
         }

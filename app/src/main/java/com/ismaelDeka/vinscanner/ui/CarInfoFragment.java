@@ -26,10 +26,10 @@ public class CarInfoFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_car_info, container, false);
 
-        RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.info_list);
+        RecyclerView recyclerView = rootView.findViewById(R.id.info_list);
         CarInfoAdapter infoAdapter;
         if(savedInstanceState == null) {
-            infoAdapter = new CarInfoAdapter(mCar.getVin(), mCar.getMarketPrice(), mCar.getAttributes(), getContext());
+            infoAdapter = new CarInfoAdapter(mCar.getVin(), mCar.getAttributes(), getContext());
         }else {
             infoAdapter = readSavedInstance(savedInstanceState);
         }
@@ -60,14 +60,13 @@ public class CarInfoFragment extends Fragment {
 
     private CarInfoAdapter readSavedInstance(Bundle b){
         String vin = b.getString("vin");
-        String price = b.getString("price");
         int size = b.getInt("attrSize");
         ArrayList<CarAttribute> attributes = new ArrayList<>();
         for(int i = 0; i < size; i++){
             attributes.add(new CarAttribute(b.getString("key"+i),b.getString("value"+i),b.getString("category"+i)));
         }
 
-        return new CarInfoAdapter(vin, price, attributes, getContext());
+        return new CarInfoAdapter(vin, attributes, getContext());
 
     }
 

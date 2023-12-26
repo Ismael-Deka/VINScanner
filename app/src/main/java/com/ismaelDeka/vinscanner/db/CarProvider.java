@@ -88,12 +88,11 @@ public class CarProvider extends ContentProvider {
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
         final int match = sUriMatcher.match(uri);
-        switch (match) {
-            case CARS:
-                return insertCar(uri, values);
-            default:
-                throw new IllegalArgumentException("Insertion is not supported for " + uri);
+        if (match == CARS) {
+            assert values != null;
+            return insertCar(uri, values);
         }
+        throw new IllegalArgumentException("Insertion is not supported for " + uri);
     }
 
     private Uri insertCar(Uri uri, ContentValues values) {
@@ -145,12 +144,12 @@ public class CarProvider extends ContentProvider {
         switch (match) {
             case CARS:
                 // Delete all rows that match the selection and selection args
-                Log.e("provider","all cars");
+
                 rowsDeleted = database.delete(CarContract.CarEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             case CAR_ID:
                 // Delete a single row given by the ID in the URI
-                Log.e("provider","all cars");
+
                 selection = CarContract.CarEntry._ID + "=?";
                 selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
                 rowsDeleted = database.delete(CarContract.CarEntry.TABLE_NAME, selection, selectionArgs);

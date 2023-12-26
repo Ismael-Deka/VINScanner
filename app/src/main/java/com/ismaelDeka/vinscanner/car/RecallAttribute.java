@@ -1,19 +1,24 @@
 package com.ismaelDeka.vinscanner.car;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
+
+import android.annotation.SuppressLint;
+import android.util.Log;
 
 /**
  * Created by Ismael on 4/27/2017.
  */
 
 public class RecallAttribute {
-    private String mCampaignNumber;
-    private String mComponent;
-    private String mSummary;
-    private String mConsequence;
-    private String mRemedy;
-    private String mDate;
+    private final String mCampaignNumber;
+    private final String mComponent;
+    private final String mSummary;
+    private final String mConsequence;
+    private final String mRemedy;
+    private final String mDate;
 
     public RecallAttribute(String campaign,String component, String summary, String consequence, String remedy, String date){
         mCampaignNumber =campaign;
@@ -26,13 +31,17 @@ public class RecallAttribute {
 
     public static String formatDate(String rawDate){
         if(rawDate != null) {
-            String[] strs = rawDate.split("[(]");
-            String str = strs[1];
-            String unixDate = str.substring(0, str.length() - 7);
-            long temp = Long.parseLong(unixDate);
-            SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM d, yyyy");
-            unixDate = sdf.format(new Date(temp));
-            return unixDate;
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf_raw = new SimpleDateFormat("dd/MM/yyyy");
+            Date date = new Date();
+            try {
+                date = sdf_raw.parse(rawDate);
+            } catch (ParseException e) {
+                Log.e("RecallAttribute", Objects.requireNonNull(e.getLocalizedMessage()));
+            }
+
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM d, yyyy");
+            assert date != null;
+            return sdf.format(date);
         }else {
             return null;
         }

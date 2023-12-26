@@ -1,6 +1,8 @@
 package com.ismaelDeka.vinscanner.adapter;
 
 import android.content.Context;
+
+import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.Html;
@@ -25,16 +27,16 @@ import static com.ismaelDeka.vinscanner.R.id.date;
 
 public class CarRecallAdapter extends RecyclerView.Adapter<CarRecallAdapter.ViewHolder> {
 
-    private ArrayList<RecallAttribute> mRecallInfo;
-    private HashMap<String,Boolean> isViewExpaned = new HashMap<>();
-    private Context mContext;
+    private final ArrayList<RecallAttribute> mRecallInfo;
+    private final HashMap<String,Boolean> isViewExpanded = new HashMap<>();
+    private final Context mContext;
 
     public CarRecallAdapter(ArrayList<RecallAttribute> newRecallInfo, Context newContext){
         mRecallInfo = newRecallInfo;
         Collections.reverse(mRecallInfo);
         mContext = newContext;
         for(int i = 0; i < mRecallInfo.size();i++){
-            isViewExpaned.put(mRecallInfo.get(i).getCampaignNumber(),false);
+            isViewExpanded.put(mRecallInfo.get(i).getCampaignNumber(),false);
         }
     }
 
@@ -56,18 +58,19 @@ public class CarRecallAdapter extends RecyclerView.Adapter<CarRecallAdapter.View
 
         public ViewHolder(View itemView) {
             super(itemView);
-            componentTextView = (TextView) itemView.findViewById(R.id.component);
-            campaignTextView = (TextView) itemView.findViewById(R.id.campaign);
-            dateTextView = (TextView) itemView.findViewById(date);
-            summaryTextView = (TextView)itemView.findViewById(R.id.summary);
-            consequenceTextView = (TextView)itemView.findViewById(R.id.consequence);
-            remedyTextView = (TextView)itemView.findViewById(R.id.remedy);
-            showMoreImage = (ImageView)itemView.findViewById(R.id.show_more);
-            recallCardView = (CardView) itemView.findViewById(R.id.recall_card);
+            componentTextView = itemView.findViewById(R.id.component);
+            campaignTextView = itemView.findViewById(R.id.campaign);
+            dateTextView = itemView.findViewById(date);
+            summaryTextView = itemView.findViewById(R.id.summary);
+            consequenceTextView = itemView.findViewById(R.id.consequence);
+            remedyTextView = itemView.findViewById(R.id.remedy);
+            showMoreImage = itemView.findViewById(R.id.show_more);
+            recallCardView = itemView.findViewById(R.id.recall_card);
 
         }
     }
 
+    @NonNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
@@ -75,8 +78,7 @@ public class CarRecallAdapter extends RecyclerView.Adapter<CarRecallAdapter.View
 
         View contactView = inflater.inflate(R.layout.recall_list_item, parent, false);
 
-        ViewHolder viewHolder = new ViewHolder(contactView);
-        return viewHolder;
+        return new ViewHolder(contactView);
     }
 
     @Override
@@ -96,7 +98,7 @@ public class CarRecallAdapter extends RecyclerView.Adapter<CarRecallAdapter.View
 
 
         String infoComponent = info.getComponent();
-        infoComponent= infoComponent.substring(0,1)+infoComponent.substring(1,infoComponent.length()).toLowerCase();
+        infoComponent= infoComponent.charAt(0)+infoComponent.substring(1).toLowerCase();
 
         component.setText(Html.fromHtml("<b>Recall Subject:</b>"+"\n"+infoComponent));
         campaign.setText(Html.fromHtml("<b>Campaign Number:</b> "+""+info.getCampaignNumber()+""));
@@ -105,7 +107,7 @@ public class CarRecallAdapter extends RecyclerView.Adapter<CarRecallAdapter.View
         consequence.setText(Html.fromHtml("<b>Consequence:</b>"+"\n"+info.getConsequence()));
         remedy.setText(Html.fromHtml("<b>Remedy:</b>"+"\n"+info.getRemedy()));
 
-        if(isViewExpaned.get(info.getCampaignNumber())) {
+        if(Boolean.TRUE.equals(isViewExpanded.get(info.getCampaignNumber()))) {
             summary.setVisibility(View.VISIBLE);
             consequence.setVisibility(View.VISIBLE);
             remedy.setVisibility(View.VISIBLE);
@@ -120,7 +122,7 @@ public class CarRecallAdapter extends RecyclerView.Adapter<CarRecallAdapter.View
         cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!isViewExpaned.get(info.getCampaignNumber())){
+                if(Boolean.FALSE.equals(isViewExpanded.get(info.getCampaignNumber()))){
                     summary.setVisibility(View.VISIBLE);
                     consequence.setVisibility(View.VISIBLE);
                     remedy.setVisibility(View.VISIBLE);
@@ -144,8 +146,8 @@ public class CarRecallAdapter extends RecyclerView.Adapter<CarRecallAdapter.View
     }
 
     public void setViewOpen(boolean isOpen,String c){
-        isViewExpaned.remove(c);
-        isViewExpaned.put(c,isOpen);
+        isViewExpanded.remove(c);
+        isViewExpanded.put(c,isOpen);
     }
 
     @Override

@@ -36,8 +36,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class CarCursorAdapter extends CursorAdapter {
 
     private boolean mDeleteState = false;
-    private ArrayList<ImageButton> mDeleteButtons;
-    private Context mContext;
+    private final ArrayList<ImageButton> mDeleteButtons;
+    private final Context mContext;
 
 
 
@@ -64,10 +64,10 @@ public class CarCursorAdapter extends CursorAdapter {
     public void bindView(View view, final Context context, Cursor cursor) {
         if(!cursor.isClosed()) {
             final View listItem = view;
-            CircleImageView logoImageView = (CircleImageView) view.findViewById(R.id.list_logo);
-            TextView nameTextView = (TextView) view.findViewById(R.id.car_name);
-            TextView vinTextView = (TextView) view.findViewById(R.id.car_vin);
-            final ImageButton deleteButton = (ImageButton) view.findViewById(R.id.car_list_delete_button);
+            CircleImageView logoImageView =  view.findViewById(R.id.list_logo);
+            TextView nameTextView = view.findViewById(R.id.car_name);
+            TextView vinTextView = view.findViewById(R.id.car_vin);
+            final ImageButton deleteButton = view.findViewById(R.id.car_list_delete_button);
             mDeleteButtons.add(deleteButton);
             if(mDeleteState){
                 deleteButton.setVisibility(View.VISIBLE);
@@ -91,7 +91,7 @@ public class CarCursorAdapter extends CursorAdapter {
             }
 
 
-            String newMake = make.substring(0, 1) + make.substring(1).toLowerCase();
+            String newMake = make.charAt(0) + make.substring(1).toLowerCase();
             final String carName = year + " " + newMake + " " + model;
             nameTextView.setText(carName);
             vinTextView.setText(vin);
@@ -171,14 +171,14 @@ public class CarCursorAdapter extends CursorAdapter {
         }
     }
     private Animation outToRightAnimation() {
-        Animation outtoRight = new TranslateAnimation(
+        Animation outToRight = new TranslateAnimation(
                 Animation.RELATIVE_TO_PARENT, 0.0f,
                 Animation.RELATIVE_TO_PARENT, +1.0f,
                 Animation.RELATIVE_TO_PARENT, 0.0f,
                 Animation.RELATIVE_TO_PARENT, 0.0f);
-        outtoRight.setDuration(500);
-        outtoRight.setInterpolator(new AccelerateInterpolator());
-        return outtoRight;
+        outToRight.setDuration(500);
+        outToRight.setInterpolator(new AccelerateInterpolator());
+        return outToRight;
     }
     private Animation inFromLeftAnimation() {
         Animation inFromLeft = new TranslateAnimation(
@@ -191,14 +191,14 @@ public class CarCursorAdapter extends CursorAdapter {
         return inFromLeft;
     }
     private Animation outToLeftAnimation() {
-        Animation outtoLeft = new TranslateAnimation(
+        Animation outToLeft = new TranslateAnimation(
                 Animation.RELATIVE_TO_PARENT, 0.0f,
                 Animation.RELATIVE_TO_PARENT, -1.0f,
                 Animation.RELATIVE_TO_PARENT, 0.0f,
                 Animation.RELATIVE_TO_PARENT, 0.0f);
-        outtoLeft.setDuration(200);
-        outtoLeft.setInterpolator(new AccelerateInterpolator());
-        return outtoLeft;
+        outToLeft.setDuration(200);
+        outToLeft.setInterpolator(new AccelerateInterpolator());
+        return outToLeft;
     }
 
     private void setAllButtonsGone(){

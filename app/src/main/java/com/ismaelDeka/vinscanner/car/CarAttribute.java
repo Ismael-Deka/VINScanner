@@ -5,9 +5,9 @@ package com.ismaelDeka.vinscanner.car;
  */
 
 public class CarAttribute {
-    private String mKey;
-    private String mValue;
-    private String mCategory;
+    private final String mKey;
+    private final String mValue;
+    private final String mCategory;
 
     public CarAttribute(String key, String value, String category){
         mKey = key;

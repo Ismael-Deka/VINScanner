@@ -16,8 +16,8 @@ import com.google.android.gms.security.ProviderInstaller;
 
 public class CarLoader extends AsyncTaskLoader<Car> {
 
-    private String mVin;
-    private Activity mParentActivity;
+    private final String mVin;
+    private final Activity mParentActivity;
 
     public CarLoader(Activity activity,String vin) {
         super(activity);
@@ -28,7 +28,7 @@ public class CarLoader extends AsyncTaskLoader<Car> {
 
     @Override
     public Car loadInBackground() {
-        if(mVin == null || mVin == "")
+        if(mVin == null || mVin.equals(""))
             return null;
         else {
             updateAndroidSecurityProvider();

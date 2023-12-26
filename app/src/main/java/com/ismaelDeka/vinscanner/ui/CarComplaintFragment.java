@@ -25,7 +25,7 @@ public class CarComplaintFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_car_complaint, container, false);
-        mComplaintList = (RecyclerView) rootView.findViewById(R.id.complaint_list);
+        mComplaintList = rootView.findViewById(R.id.complaint_list);
 
         mComplaintList.setAdapter(new CarComplaintAdapter(mCar.getComplaints(),getContext()));
         mComplaintList.setLayoutManager(new LinearLayoutManager(getContext()));

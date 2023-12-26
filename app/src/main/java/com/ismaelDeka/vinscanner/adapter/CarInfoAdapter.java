@@ -2,6 +2,8 @@ package com.ismaelDeka.vinscanner.adapter;
 
 import android.content.Context;
 import android.graphics.Color;
+
+import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.Html;
@@ -24,21 +26,20 @@ import java.util.HashMap;
  */
 
 public class CarInfoAdapter extends RecyclerView.Adapter<CarInfoAdapter.ViewHolder> {
-    private ArrayList<CarAttribute> mCarInfo;
-    private HashMap<String,Boolean> isViewExpaned = new HashMap<>();
-    private ArrayList<String> mCategories;
-    private String mVin;
-    private String mMsrp;
-    private Context mContext;
+    private final ArrayList<CarAttribute> mCarInfo;
+    private final HashMap<String,Boolean> isViewExpanded = new HashMap<>();
+    private final ArrayList<String> mCategories;
+    private final String mVin;
 
-    public CarInfoAdapter(String vin,String msrp,ArrayList<CarAttribute> newCarInfo, Context newContext){
+    private final Context mContext;
+
+    public CarInfoAdapter(String vin, ArrayList<CarAttribute> newCarInfo, Context newContext){
         mCarInfo = newCarInfo;
         mContext = newContext;
         mVin = vin;
-        mMsrp =msrp;
         mCategories = getCurrentCategories(newCarInfo);
         for(int i = 0; i < mCategories.size(); i++){
-            isViewExpaned.put(mCategories.get(i),true);
+            isViewExpanded.put(mCategories.get(i),true);
         }
     }
 
@@ -48,7 +49,6 @@ public class CarInfoAdapter extends RecyclerView.Adapter<CarInfoAdapter.ViewHold
         for(int i =2; i<info.size(); i++){
             if(!categories.contains(info.get(i).getCategory())){
                 categories.add(info.get(i).getCategory());
-                Log.e("adapter",info.get(i).getCategory());
             }
         }
         Collections.sort(categories);
@@ -71,14 +71,15 @@ public class CarInfoAdapter extends RecyclerView.Adapter<CarInfoAdapter.ViewHold
 
         public ViewHolder(View itemView) {
             super(itemView);
-            categoriesTextView = (TextView)itemView.findViewById(R.id.category);
-            attributesTextView = (TextView)itemView.findViewById(R.id.attributes);
-            showMoreImage = (ImageView)itemView.findViewById(R.id.show_more_info);
-            infoCardView = (CardView) itemView.findViewById(R.id.info_card);
+            categoriesTextView = itemView.findViewById(R.id.category);
+            attributesTextView = itemView.findViewById(R.id.attributes);
+            showMoreImage = itemView.findViewById(R.id.show_more_info);
+            infoCardView = itemView.findViewById(R.id.info_card);
 
         }
     }
 
+    @NonNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
@@ -86,8 +87,7 @@ public class CarInfoAdapter extends RecyclerView.Adapter<CarInfoAdapter.ViewHold
 
         View contactView = inflater.inflate(R.layout.car_info_list_item, parent, false);
 
-        ViewHolder viewHolder = new ViewHolder(contactView);
-        return viewHolder;
+        return new ViewHolder(contactView);
     }
 
     private ArrayList<CarAttribute> getAttributesByCategory(String category){
@@ -117,12 +117,10 @@ public class CarInfoAdapter extends RecyclerView.Adapter<CarInfoAdapter.ViewHold
         category.setText(mCategories.get(position));
         category.setTextColor(Color.parseColor("#42A5F5"));
         attributes.setText("");
-        String key ="";
-        String value="";
+        String key;
+        String value;
         if(mCategories.get(position).equals("General")){
             attributes.append(Html.fromHtml("<b>Vin</b>: " + mVin));
-            attributes.append("\n" + "\n");
-            attributes.append(Html.fromHtml("<b>List price</b>: " + mMsrp));
             attributes.append("\n" + "\n");
         }
 
@@ -138,7 +136,7 @@ public class CarInfoAdapter extends RecyclerView.Adapter<CarInfoAdapter.ViewHold
 
 
 
-        if(isViewExpaned.get(mCategories.get(position))) {
+        if(Boolean.TRUE.equals(isViewExpanded.get(mCategories.get(position)))) {
             attributes.setVisibility(View.VISIBLE);
             showMore.setImageResource(R.drawable.ic_keyboard_arrow_up_black_24dp);
         }else {
@@ -149,7 +147,7 @@ public class CarInfoAdapter extends RecyclerView.Adapter<CarInfoAdapter.ViewHold
         cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!isViewExpaned.get(mCategories.get(p))){
+                if(Boolean.FALSE.equals(isViewExpanded.get(mCategories.get(p)))){
                     attributes.setVisibility(View.VISIBLE);
                     showMore.setImageResource(R.drawable.ic_keyboard_arrow_up_black_24dp);
                     setViewOpen(true,mCategories.get(p));
@@ -169,8 +167,8 @@ public class CarInfoAdapter extends RecyclerView.Adapter<CarInfoAdapter.ViewHold
     }
 
     public void setViewOpen(boolean isOpen,String c){
-        isViewExpaned.remove(c);
-        isViewExpaned.put(c,isOpen);
+        isViewExpanded.remove(c);
+        isViewExpanded.put(c,isOpen);
     }
 
     @Override

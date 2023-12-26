@@ -1,5 +1,6 @@
 package com.ismaelDeka.vinscanner.ui;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
@@ -26,10 +27,10 @@ import com.google.android.gms.vision.barcode.Barcode;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static android.hardware.SensorManager.SENSOR_DELAY_NORMAL;
 
-@SuppressWarnings("deprecation")
 public class VinScannerActivity extends AppCompatActivity implements VinScanner.OnVinFoundListener {
 
     public final String TAG = "VinScannerActivity";
@@ -45,6 +46,7 @@ public class VinScannerActivity extends AppCompatActivity implements VinScanner.
     private int mCurrentRotation = -1;
 
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,20 +58,20 @@ public class VinScannerActivity extends AppCompatActivity implements VinScanner.
             }
         };
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
-        getSupportActionBar().hide();
+        Objects.requireNonNull(getSupportActionBar()).hide();
         setContentView(R.layout.activity_vin_scanner);
 
         Toast.makeText(this,"Tap screen to focus.",Toast.LENGTH_LONG).show();
 
         mScanner = new VinScanner(this);
         mScanner.setOnVinFoundListener(this);
-        mBarcodeOutline = (ImageView) findViewById(R.id.barcode_outline);
-        mPreview = (SurfaceView) findViewById(R.id.camera_preview);
+        mBarcodeOutline = findViewById(R.id.barcode_outline);
+        mPreview = findViewById(R.id.camera_preview);
         mHolder = mPreview.getHolder();
         mHolder.addCallback(callBack);
 
-        mBackButton = (ImageButton) findViewById(R.id.back_button);
-        mFlashlight = (ImageButton) findViewById(R.id.flashlight);
+        mBackButton = findViewById(R.id.back_button);
+        mFlashlight = findViewById(R.id.flashlight);
 
         mBackButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -155,16 +157,12 @@ public class VinScannerActivity extends AppCompatActivity implements VinScanner.
         }
 
         List<String> supportedFlashModes = parameters.getSupportedFlashModes();
-        if (supportedFlashModes == null || supportedFlashModes.isEmpty() || supportedFlashModes.size() == 1 &&
-                supportedFlashModes.get(0).equals(Camera.Parameters.FLASH_MODE_OFF)) {
-            return false;
-        }
-
-        return true;
+        return supportedFlashModes != null && !supportedFlashModes.isEmpty() && (supportedFlashModes.size() != 1 ||
+                !supportedFlashModes.get(0).equals(Camera.Parameters.FLASH_MODE_OFF));
     }
 
 
-    private SurfaceHolder.Callback callBack = new SurfaceHolder.Callback() {
+    private final SurfaceHolder.Callback callBack = new SurfaceHolder.Callback() {
         @Override
         public void surfaceCreated(SurfaceHolder surfaceHolder) {
 
@@ -181,7 +179,7 @@ public class VinScannerActivity extends AppCompatActivity implements VinScanner.
 
         @Override
         public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-            Log.e(TAG,"Releasing camera");
+            Log.i(TAG,"Releasing camera");
             mOrientationEventListener.disable();
             mCamera.setPreviewCallback(null);
             mCamera.stopPreview();
@@ -204,7 +202,6 @@ public class VinScannerActivity extends AppCompatActivity implements VinScanner.
                 int degrees = 0;
                 switch (rotation) {
                     case Surface.ROTATION_0:
-                        degrees = 0;
                         break;
                     case Surface.ROTATION_90:
                         degrees = 90;
@@ -215,11 +212,13 @@ public class VinScannerActivity extends AppCompatActivity implements VinScanner.
                     case Surface.ROTATION_270:
                         degrees = 270;
                         break;
+                    default:
+
                 }
                 int result;
-                Log.e(TAG, info.orientation + "");
+                Log.i(TAG, info.orientation + "");
                 result = (info.orientation - degrees + 360) % 360;
-                Log.e(TAG, result + "");
+                Log.i(TAG, result + "");
                 mCamera.setDisplayOrientation(result);
 
         }
@@ -236,7 +235,7 @@ public class VinScannerActivity extends AppCompatActivity implements VinScanner.
     }
 
     private void startCamera(){
-        Log.e(TAG,"Starting Camera.");
+        Log.i(TAG,"Starting Camera.");
         mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_BACK);
         try {
             mCamera.setPreviewDisplay(mHolder);
@@ -257,7 +256,7 @@ public class VinScannerActivity extends AppCompatActivity implements VinScanner.
 
     }
 
-    public void doTouchFocus(final Rect tfocusRect) {
+    public void doTouchFocus(final Rect focusRect) {
 
         Camera.AutoFocusCallback myAutoFocusCallback = new Camera.AutoFocusCallback(){
 
@@ -272,7 +271,7 @@ public class VinScannerActivity extends AppCompatActivity implements VinScanner.
 
         try {
             List<Camera.Area> focusList = new ArrayList<>();
-            Camera.Area focusArea = new Camera.Area(tfocusRect, 1000);
+            Camera.Area focusArea = new Camera.Area(focusRect, 1000);
             focusList.add(focusArea);
 
             Camera.Parameters param = mCamera.getParameters();
